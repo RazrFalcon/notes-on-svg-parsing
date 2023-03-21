@@ -1,0 +1,10 @@
+<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="198" height="98" fill="white" stroke="black"/>
+    <text x="50" y="60" font-family="Noto Sans" font-size="48">
+        <tspan fill="green" text-decoration="underline">
+            <tspan fill="blue" text-decoration="line-through">
+                <tspan fill="black">Text</tspan>
+            </tspan>
+        </tspan>
+    </text>
+</svg>

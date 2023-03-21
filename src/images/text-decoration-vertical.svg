@@ -1,0 +1,5 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="198" height="198" fill="white" stroke="black"/>
+    <text x="100" y="100" font-family="Amiri" font-size="32" text-anchor="middle"
+          writing-mode="tb" text-decoration="underline">本 Hi! اليابان</text>
+</svg>

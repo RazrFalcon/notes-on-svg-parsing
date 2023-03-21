@@ -1,0 +1,8 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="198" height="198" fill="white" stroke="black"/>
+    <path d="M 20 100 L 180 100 M 100 20 L 100 180" stroke="gray" stroke-width="0.5"/>
+    <text y="100" x="60" writing-mode="tb" font-family="Noto Sans" font-size="32">
+        Start<tspan y="100" x="100" text-anchor="middle">middle</tspan>
+        <tspan y="100" x="140" text-anchor="end">end</tspan>
+    </text>
+</svg>

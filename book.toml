@@ -1,0 +1,6 @@
+[book]
+authors = ["Yevhenii Reizner"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Notes on SVG parsing"

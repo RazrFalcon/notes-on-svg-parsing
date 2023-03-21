@@ -1,0 +1,6 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <filter id="filter1" filterUnits="userSpaceOnUse" x="20" y="20" width="160" height="160">
+        <feFlood flood-color="green"/>
+    </filter>
+    <g filter="url(#filter1)"/>
+</svg>
