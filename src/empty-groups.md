@@ -82,7 +82,7 @@ So in this case, not only the group itself isn't useless, but also the `fill` pr
 And yes, you can use a gradient or a pattern input as well. The only problem is that this
 case is completely undocumented and each SVG library does whatever it wants.
 
-Just look how [this](https://github.com/RazrFalcon/resvg-test-suite/blob/master/svg/e-filter-037.svg)
-file would be rendered. It's just comically bad.
+Just look how [this](https://github.com/RazrFalcon/notes-on-svg-parsing/blob/master/src/images/filter-fill-input-bug.svg)
+file would be rendered. It's comically bad.
 
 ![](images/filter-fill-input-bug.png)
