@@ -31,5 +31,5 @@ There is just too much of it.
 
 Maybe we should _just_ use something else? You might ask. Like what?<br>
 The only open-ish SVG alternative is PDF. Which is a nightmare on its own,
-while being conceptually simpler than SVG, since it doesn't have
+while being conceptually simpler, since it doesn't have
 a text layout, filters/effects, animations and events.

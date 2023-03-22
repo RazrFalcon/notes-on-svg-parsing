@@ -41,7 +41,7 @@ What it all means is that we can easily write something like:
 and it would be rendered as:
 
 <p align="center">
-<img src="../images/empty-group-with-filter.png" width="200" height="200">
+<img src="images/empty-group-with-filter.png" width="200" height="200">
 </p>
 
 ## A group color

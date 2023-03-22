@@ -20,7 +20,7 @@ This means that:
 would be rendered as a circle with a radius 25 at 50,50
 
 <p align="center">
-<img src="../images/stroke-linecap-round.png" width="100"/>
+<img src="images/stroke-linecap-round.png" width="100"/>
 </p>
 
 and
@@ -32,7 +32,7 @@ and
 would be rendered as a 50x50 rectangle at 25,25
 
 <p align="center">
-<img src="../images/stroke-linecap-square.png" width="100"/>
+<img src="images/stroke-linecap-square.png" width="100"/>
 </p>
 
 And while some 2D graphics libraries do support this out of the box, some not.

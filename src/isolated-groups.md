@@ -72,13 +72,13 @@ How bad can it be? Let's try to render a group with three circles and opacity:
 ```
 
 <p align="center">
-<img src="../images/group-opacity-1.png" width="200"/>
+<img src="images/group-opacity-1.png" width="200"/>
 </p>
 
 If we ignore the group isolation and simply apply opacity to each circle we would get:
 
 <p align="center">
-<img src="../images/group-opacity-2.png" width="200"/>
+<img src="images/group-opacity-2.png" width="200"/>
 </p>
 
 Funnily enough, this is exactly what QtSVG does. It doesn't support isolation.
