@@ -18,7 +18,7 @@ So in the case of:
 
 our underline would be green and not black.
 
-<img src="images/text-decoration-inheritence.png">
+<img src="../images/text-decoration-inheritence.png">
 
 Hm... Ok, let's ignore different width, height, position and everything else for now.
 
@@ -40,7 +40,7 @@ And yes, underline thickness and position are stored in the font.
 
 In reality though...
 
-<img src="images/text-decoration-font.png">
+<img src="../images/text-decoration-font.png">
 
 Firefox and Safari are the only one "correct" here.
 
@@ -60,7 +60,7 @@ And yes, preserved their individual styles.
 </text>
 ```
 
-<img src="images/text-decoration-inheritence-multiple.png">
+<img src="../images/text-decoration-inheritence-multiple.png">
 
 Here, Firefox and Batik are correct.
 But at this point it's even hard to tell who is right or wrong.
@@ -75,7 +75,7 @@ many other SVG constructs. Like a vertical text.
       writing-mode="tb" text-decoration="underline">本 Hi! اليابان</text>
 ```
 
-<img src="images/text-decoration-vertical.png">
+<img src="../images/text-decoration-vertical.png">
 
 Well, yeah... Safari, for a browser, is comically bad here.
 
@@ -93,7 +93,7 @@ is not longer... well, a line.
       font-family="Noto Sans" font-size="86" text-decoration="underline">Text</text>
 ```
 
-<img src="images/text-decoration-rotate.png">
+<img src="../images/text-decoration-rotate.png">
 
 Note that `text-decoration` would be converted into paths and become a part of
 the whole text content. Basically, the `text` element would become a group
@@ -118,6 +118,6 @@ A vertical text, partially on a circle path, with decoration defined outside the
 </g>
 ```
 
-<img src="images/text-decoration-on-path.png">
+<img src="../images/text-decoration-on-path.png">
 
 Yeah... This is SVG for you. No one knows what to do.

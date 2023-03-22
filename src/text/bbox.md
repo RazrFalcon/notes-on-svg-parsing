@@ -17,14 +17,14 @@ Let's say we have something as simple as:
 ```
 
 <p align="center">
-<img src="images/text-bbox-base.png" width="200"/>
+<img src="../images/text-bbox-base.png" width="200"/>
 </p>
 
 What do you think is the bounding box of this text?
 Something like this (highlighted with a green rectangle)?
 
 <p align="center">
-<img src="images/text-bbox-wrong.png" width="200"/>
+<img src="../images/text-bbox-wrong.png" width="200"/>
 </p>
 
 Nope! This is a _path_ bounding box, not _text_ bounding box.
@@ -42,7 +42,7 @@ This filter will fill a region that equals the object's bounding box with an aqu
 And after applying it to our text we would get:
 
 <p align="center">
-<img src="images/text-bbox-actual.png" width="200"/>
+<img src="../images/text-bbox-actual.png" width="200"/>
 </p>
 
 If you're familiar with a modern text layout you're probably not that surprised.
@@ -50,7 +50,7 @@ But if you're not, here is a cool illustration from Apple's docs:
 
 <!-- src: https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/Art/glyph_metrics_2x.png -->
 <p align="center">
-<img src="images/glyph-metrics.png" height="300"/>
+<img src="../images/glyph-metrics.png" height="300"/>
 </p>
 
 What we're interested in here is _line height_ (the first vertical measure on the left).
@@ -75,7 +75,7 @@ For an SVG like:
 We would get:
 
 <p align="center">
-<img src="images/text-bbox-space-preserve.png" width="200"/>
+<img src="../images/text-bbox-space-preserve.png" width="200"/>
 </p>
 
 Chrome, Firefox, Safari and Inkscape handle this correctly, but Batik and librsvg don't.
@@ -94,7 +94,7 @@ is [Zalgo text](https://en.wikipedia.org/wiki/Zalgo_text).
 Let's try rendering Te̶̗̯̪̺̋̓̍̾́xt using various SVG libraries:
 
 <p align="center">
-<img src="images/text-bbox-zalgo.png"/>
+<img src="../images/text-bbox-zalgo.png"/>
 </p>
 
 Ugh... Welcome to the hell the SVG Text is.

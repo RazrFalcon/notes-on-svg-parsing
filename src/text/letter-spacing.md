@@ -11,7 +11,7 @@ CSS even has [a good illustration](https://www.w3.org/TR/css-text-3/#cursive-tra
 But the problem is that it seems like no one cares. At least for SVG.<br>
 Instead of نص we're getting:
 
-<img src="images/letter-spacing-arabic.png">
+<img src="../images/letter-spacing-arabic.png">
 
 Safari, somehow, even disabled shaping completely.
 
@@ -24,7 +24,7 @@ This is how the following SVG would be rendered:
 <text x="100" text-anchor="middle" letter-spacing="100" font-size="48">A</text>
 ```
 
-<img src="images/letter-spacing-tail.png">
+<img src="../images/letter-spacing-tail.png">
 
 As you can see, Chrome, Firefox and Batik are clearly adding a trailing space.
 That's why center alignment is broken.
@@ -36,4 +36,4 @@ should put letters close to each other, a larger one produces random results.
 <text x="100" y="100" letter-spacing="-1000" text-anchor="middle">Text</text>
 ```
 
-<img src="images/letter-spacing-negative.png">
+<img src="../images/letter-spacing-negative.png">

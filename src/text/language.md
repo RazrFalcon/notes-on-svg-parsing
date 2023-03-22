@@ -29,7 +29,7 @@ Based on my tests, only Chrome, Firefox and librsvg do handle `xml:lang`
 and the expected output should look something like this:
 
 <p align="center">
-<img src="images/text-language.png" width="200"/>
+<img src="../images/text-language.png" width="200"/>
 </p>
 
 As you can see, while our Unicode strings are identical, they are rendered differently.<br>

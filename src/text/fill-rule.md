@@ -9,7 +9,7 @@ by the `fill-rule` property. It might not affect a typical Latin text, but in co
 it might lead to bugs like this:
 
 <p align="center">
-<img src="images/text-fill-rule.png" width="250"/>
+<img src="../images/text-fill-rule.png" width="250"/>
 </p>
 
 And before you think that no one would make such an obvious mistake,

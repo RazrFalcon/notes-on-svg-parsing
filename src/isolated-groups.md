@@ -81,7 +81,7 @@ If we ignore the group isolation and simply apply opacity to each circle we woul
 <img src="images/group-opacity-2.png" width="200"/>
 </p>
 
-Funnily enough, this is exactly what QtSVG does. It doesn't support isolation.
+Funnily enough, this is exactly what QtSvg does. It doesn't support isolation.
 Probably for performance reasons.
 
 <br>
