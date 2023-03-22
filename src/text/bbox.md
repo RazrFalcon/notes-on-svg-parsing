@@ -93,8 +93,6 @@ is [Zalgo text](https://en.wikipedia.org/wiki/Zalgo_text).
 
 Let's try rendering Te̶̗̯̪̺̋̓̍̾́xt using various SVG libraries:
 
-<p align="center">
-<img src="../images/text-bbox-zalgo.png"/>
-</p>
+![](../images/text-bbox-zalgo.png)
 
 Ugh... Welcome to the hell the SVG Text is.

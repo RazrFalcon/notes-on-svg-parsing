@@ -24,7 +24,7 @@ How about a rotated rectangle with a `feGaussianBlur`
       transform="rotate(45 60 60)"/>
 ```
 
-<img src="images/filter-transform-blur.png"/>
+![](images/filter-transform-blur.png)
 
 or a simple `feFlood`
 
@@ -36,7 +36,7 @@ or a simple `feFlood`
       transform="skewX(30) rotate(-30) translate(-80 40) scale(2)"/>
 ```
 
-<img src="images/filter-transform-flood.png"/>
+![](images/filter-transform-flood.png)
 
 or an even simpler `feOffset`
 
@@ -48,7 +48,7 @@ or an even simpler `feOffset`
       filter="url(#filter1)" transform="skewX(30) translate(-50)"/>
 ```
 
-<img src="images/filter-transform-offset.png"/>
+![](images/filter-transform-offset.png)
 
 and what about `feTile`
 
@@ -62,7 +62,7 @@ and what about `feTile`
       filter="url(#filter1)" transform="skewX(30) rotate(30)"/>
 ```
 
-<img src="images/filter-transform-tile.png"/>
+![](images/filter-transform-tile.png)
 
 And the final piece! The absolute state of SVG - `feDiffuseLighting` + `feSpotLight`
 
@@ -80,7 +80,7 @@ And the final piece! The absolute state of SVG - `feDiffuseLighting` + `feSpotLi
       fill="url(#rg1)" filter="url(#filter1)" transform="skewX(30) rotate(30)"/>
 ```
 
-<img src="images/filter-transform-spotlight.png"/>
+![](images/filter-transform-spotlight.png)
 
 Every single application renders it differently! It's absurd!
 

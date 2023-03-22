@@ -85,4 +85,4 @@ case is completely undocumented and each SVG library does whatever it wants.
 Just look how [this](https://github.com/RazrFalcon/resvg-test-suite/blob/master/svg/e-filter-037.svg)
 file would be rendered. It's just comically bad.
 
-![](../images/filter-fill-input-bug.png)
+![](images/filter-fill-input-bug.png)

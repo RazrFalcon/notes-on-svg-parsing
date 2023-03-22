@@ -21,7 +21,7 @@ How bad can it be? Well, let's start with something simple.
 </text>
 ```
 
-<img src="../images/text-anchor-english.png"/>
+![](../images/text-anchor-english.png)
 
 Inkscape already out.
 
@@ -37,7 +37,7 @@ What about Arabic text?
 </text>
 ```
 
-<img src="../images/text-anchor-arabic-1.png"/>
+![](../images/text-anchor-arabic-1.png)
 
 Hm... Not good. Technically, our overlord Chrome is correct here.
 Firefox is close, but has a slightly incorrect placement.
@@ -57,7 +57,7 @@ Now let's make our text a bit more complex, but logically the same.
 
 Now our first chunk doesn't have a dedicated `tspan`, but logically it's identical to the one above.
 
-<img src="../images/text-anchor-arabic-2.png"/>
+![](../images/text-anchor-arabic-2.png)
 
 And immediately, our seemingly trivial change lead to a different output.
 
@@ -72,7 +72,7 @@ Somehow, even by removing a new line from the first text node we can change the 
 </text>
 ```
 
-<img src="../images/text-anchor-arabic-3.png"/>
+![](../images/text-anchor-arabic-3.png)
 
 Notice that Safari no longer renders two words one the same line now.
 
@@ -91,6 +91,6 @@ At last, what about the vertical layout? Even with an English text.
 </text>
 ```
 
-<img src="../images/text-anchor-vertical.png"/>
+![](../images/text-anchor-vertical.png)
 
 Yeah... As expected.
