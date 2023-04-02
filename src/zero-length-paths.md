@@ -35,6 +35,8 @@ would be rendered as a 50x50 rectangle at 25,25
 <img src="images/stroke-linecap-square.png" width="100"/>
 </p>
 
+Note that `M 10 20` is a malformed path not a zero-length one, while `M 10 20 Z` is zero-length.
+
 And while some 2D graphics libraries do support this out of the box, some not.
 Which means that an SVG rendering library should check each path for zero-length
 subpaths beforehand and replace them with circles and rectangles accordingly.

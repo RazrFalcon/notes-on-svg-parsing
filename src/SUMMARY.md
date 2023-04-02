@@ -5,6 +5,7 @@
 - [Relative units](./relative-units.md)
 - [`rx`/`ry` attributes resolving](./rx-ry.md)
 - [Attributes inheritance](./inheritance.md)
+- [Path data](./path-data.md)
 - [Isolated groups](./isolated-groups.md)
 - [Gradients resolving](./gradients-resolving.md)
 - [Recursive references](./recursive.md)

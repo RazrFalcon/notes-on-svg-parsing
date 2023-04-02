@@ -1,6 +1,6 @@
 # Automatic document size
 
-A document size in SVG is optional. Meaning you can skip `width`, `height`
+A document size is optional in SVG. Meaning you can skip `width`, `height`
 and `viewBox` attributes on the root `svg` element.
 
 ```xml
@@ -25,7 +25,7 @@ What about an image that is actually an SVG as well?
 Does it mean we have to parse it as well?
 What if that SVG doesn't have size either?
 
-What if our image is just an URL and we have to download the image first?
+What if our image is just an URL and we have to download it first?
 
 And what about text? Not only its bounding box is not what you might expect
 (see the [Text bounding box](./text/bbox.md) chapter).
@@ -38,5 +38,5 @@ the document size, which is far from ideal.
 
 <br>
 
-In the end, we have a rarely used, undocumented feature that even when implemented
+In the end, we have a rarely used, barely documented feature that even when implemented
 "correctly" would produce unexpected results.

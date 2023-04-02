@@ -12,5 +12,7 @@ it might lead to bugs like this:
 <img src="../images/text-fill-rule.png" width="250"/>
 </p>
 
+A proper parser must always set text `fill-rule` to `nonzero`.
+
 And before you think that no one would make such an obvious mistake,
 the image above was produced by Inkscape 1.2 (2022).
