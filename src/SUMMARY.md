@@ -4,6 +4,7 @@
 - [The root of the problem](./the-root-of-the-problem.md)
 - [Relative units](./relative-units.md)
 - [`rx`/`ry` attributes resolving](./rx-ry.md)
+- [Length parsing](./length-parsing.md)
 - [Attributes inheritance](./inheritance.md)
 - [Path data](./path-data.md)
 - [Isolated groups](./isolated-groups.md)
