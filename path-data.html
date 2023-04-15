@@ -1,0 +1,431 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Path data - Notes on SVG parsing</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Intro</a></li><li class="chapter-item expanded "><a href="the-root-of-the-problem.html"><strong aria-hidden="true">2.</strong> The root of the problem</a></li><li class="chapter-item expanded "><a href="relative-units.html"><strong aria-hidden="true">3.</strong> Relative units</a></li><li class="chapter-item expanded "><a href="rx-ry.html"><strong aria-hidden="true">4.</strong> rx/ry attributes resolving</a></li><li class="chapter-item expanded "><a href="length-parsing.html"><strong aria-hidden="true">5.</strong> Length parsing</a></li><li class="chapter-item expanded "><a href="inheritance.html"><strong aria-hidden="true">6.</strong> Attributes inheritance</a></li><li class="chapter-item expanded "><a href="path-data.html" class="active"><strong aria-hidden="true">7.</strong> Path data</a></li><li class="chapter-item expanded "><a href="isolated-groups.html"><strong aria-hidden="true">8.</strong> Isolated groups</a></li><li class="chapter-item expanded "><a href="gradients-resolving.html"><strong aria-hidden="true">9.</strong> Gradients resolving</a></li><li class="chapter-item expanded "><a href="recursive.html"><strong aria-hidden="true">10.</strong> Recursive references</a></li><li class="chapter-item expanded "><a href="empty-groups.html"><strong aria-hidden="true">11.</strong> Renderable empty groups</a></li><li class="chapter-item expanded "><a href="zero-length-paths.html"><strong aria-hidden="true">12.</strong> Zero-length paths</a></li><li class="chapter-item expanded "><a href="filter-transform.html"><strong aria-hidden="true">13.</strong> Filter transform</a></li><li class="chapter-item expanded "><a href="auto-size.html"><strong aria-hidden="true">14.</strong> Automatic document size</a></li><li class="chapter-item expanded "><a href="stroke-fallback.html"><strong aria-hidden="true">15.</strong> Stroke paint fallback</a></li><li class="chapter-item expanded "><a href="svg2-presentation.html"><strong aria-hidden="true">16.</strong> Presentation attributes in SVG 2</a></li><li class="chapter-item expanded "><a href="text/index.html"><strong aria-hidden="true">17.</strong> Text</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="text/character.html"><strong aria-hidden="true">17.1.</strong> A character</a></li><li class="chapter-item expanded "><a href="text/chunks.html"><strong aria-hidden="true">17.2.</strong> Text chunks</a></li><li class="chapter-item expanded "><a href="text/whitespaces.html"><strong aria-hidden="true">17.3.</strong> Whitespaces handling</a></li><li class="chapter-item expanded "><a href="text/bbox.html"><strong aria-hidden="true">17.4.</strong> Bounding box</a></li><li class="chapter-item expanded "><a href="text/language.html"><strong aria-hidden="true">17.5.</strong> Language</a></li><li class="chapter-item expanded "><a href="text/letter-spacing.html"><strong aria-hidden="true">17.6.</strong> letter-spacing</a></li><li class="chapter-item expanded "><a href="text/text-decoration.html"><strong aria-hidden="true">17.7.</strong> text-decoration</a></li><li class="chapter-item expanded "><a href="text/text-anchor.html"><strong aria-hidden="true">17.8.</strong> text-anchor</a></li><li class="chapter-item expanded "><a href="text/fill-rule.html"><strong aria-hidden="true">17.9.</strong> fill-rule</a></li></ol></li><li class="chapter-item expanded "><a href="use/index.html"><strong aria-hidden="true">18.</strong> The use element</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="use/use-to-symbol.html"><strong aria-hidden="true">18.1.</strong> use to symbol</a></li><li class="chapter-item expanded "><a href="use/use-to-svg-size-resolving.html"><strong aria-hidden="true">18.2.</strong> use to svg size resolving</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Notes on SVG parsing</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="path-data"><a class="header" href="#path-data">Path data</a></h1>
+<p><a href="https://www.w3.org/TR/SVG2/paths.html#PathData">SVG path data</a>,
+aka the <code>d</code> attribute in the <code>path</code> element, deserves its own book. This is how complicated it is.</p>
+<p>Sure, in most cases you will see something like <code>M 100 100 L 200 200</code> and it doesn't look
+that bad. But <code>M10-20A5.5.3-4 110-.1</code> is a perfectly valid SVG path as well.
+How is it possible? Let's find out!</p>
+<h2 id="basics"><a class="header" href="#basics">Basics</a></h2>
+<p>While the <a href="https://www.w3.org/TR/SVG2/paths.html#PathData">SVG path data</a> section of the spec
+details everything nicely, here are some basic terminology:</p>
+<ul>
+<li><em>command</em> - upper or lower case M, L, H, V, C, S, Q, T, A and Z character</li>
+<li><em>coordinate</em> - a number, usually a pair</li>
+<li><em>segment</em> - a pair of a (potentially implicit) <em>command</em> and <em>coordinates</em></li>
+<li><em>subpath</em> - a list of <em>segments</em> starting from MoveTo and ending with ClosePath, a new MoveTo
+or the end of the data</li>
+<li><em>path</em> - a list of <em>subpaths</em></li>
+</ul>
+<h2 id="parsing-steps"><a class="header" href="#parsing-steps">Parsing steps</a></h2>
+<p>Path data parsing can be split into two steps: parsing/tokenization of the original segments
+(absolute, relative, implicit, shorthands)
+and simplification of them to leave only the basic segments (move, line, curve, close)
+in absolute coordinates.</p>
+<p>The <em>simplification</em> step is important, since SVG path data notation is far more complex
+then a typical 2D library API would allow. That's what this chapter about.</p>
+<h2 id="implicit-sequential-commands"><a class="header" href="#implicit-sequential-commands">Implicit sequential commands</a></h2>
+<p>If a path has multiple sequential segments of the same type, like:</p>
+<pre><code>M 10 20 H 10 H 20 H 30 V 40
+</code></pre>
+<p>SVG allows us to specify the command only the first time, like:</p>
+<pre><code>M 10 20 H 10 20 30 V 40
+</code></pre>
+<h2 id="implicit-sequential-moveto-commands"><a class="header" href="#implicit-sequential-moveto-commands">Implicit sequential MoveTo commands</a></h2>
+<p>If we take the idea above and apply it to MoveTo (<code>M</code>) segments it <em>will not</em> produce
+the output you would expect.</p>
+<p>In SVG, the following path will produce nothing since a single subpath must have
+at least two segments. And here we have two subpaths with a single segment.
+And no, this is not two <a href="./zero-length-paths.html">zero-length subpaths</a>.</p>
+<pre><code>M 10 20 M 30 40
+</code></pre>
+<br>
+<p>But the following path will produce a line. Why?!
+Because an implicit command after MoveTo is treated as LineTo and not MoveTo. Yeah...</p>
+<pre><code>M 10 20 30 40
+</code></pre>
+<p>Is the same as:</p>
+<pre><code>M 10 20 L 30 40
+</code></pre>
+<br>
+<p>And we're not done yet. The implicit LineTo command is affected by MoveTo's absolute/relative state.
+Meaning that:</p>
+<pre><code>m 10 20 30 40
+</code></pre>
+<p>is</p>
+<pre><code>m 10 20 l 30 40
+</code></pre>
+<p>and not</p>
+<pre><code>m 10 20 L 30 40
+</code></pre>
+<h2 id="implicit-moveto-segment-after-closepath"><a class="header" href="#implicit-moveto-segment-after-closepath">Implicit MoveTo segment after ClosePath</a></h2>
+<p>And we're not done with MoveTo yet. If you read the spec extremely carefully,
+you will notice the following line:</p>
+<blockquote>
+<p>If a &quot;closepath&quot; is followed immediately by any other command,
+then the next subpath starts at the same initial point as the current subpath.</p>
+</blockquote>
+<p>Which means that:</p>
+<pre><code>M 10 20 L 30 40 Z L 50 60
+</code></pre>
+<p>is identical to:</p>
+<pre><code>M 10 20 L 30 40 Z M 10 20 L 50 60
+</code></pre>
+<p>and it's not an error.</p>
+<br>
+<p>What is interesting is that path data <em>must</em> start with a MoveTo segment.
+Meaning that the following path is invalid:</p>
+<pre><code>L 30 40
+</code></pre>
+<p>and <em>must not</em> be treated as</p>
+<pre><code>M 0 0 L 30 40
+</code></pre>
+<p>or something like that.</p>
+<p>And surprise-surprise, some libraries do that. Specifically Batik and QtSvg.</p>
+<h2 id="relative-moveto-segment-after-closepath"><a class="header" href="#relative-moveto-segment-after-closepath">Relative MoveTo segment after ClosePath</a></h2>
+<p>A relative MoveTo segment after ClosePath is relative to the previous MoveTo segment
+since ClosePath moved the current coordinate to it.</p>
+<p>It might not look like that big of a problem, but depending of how you're parsing the path data
+you might use the previous MoveTo coordinate directly, which is incorrect.
+The previous <em>absolute</em> MoveTo coordinate must be used.</p>
+<p>Meaning that in the case of:</p>
+<pre><code>M 10 20 L 30 40
+m 50 60 L 70 80 Z
+m 90 100 L 110 120
+</code></pre>
+<p>the second MoveTo is relative to the current position, i.e. 30,40 + 50,60.
+And the third MoveTo is relative to the <em>absolute</em> second MoveTo, i.e. 30,40 + 50,60 + 90,100</p>
+<h2 id="arcto-flags"><a class="header" href="#arcto-flags">ArcTo flags</a></h2>
+<p>The <a href="https://www.w3.org/TR/SVG2/paths.html#PathDataEllipticalArcCommands">ArcTo</a> segment has
+a pretty straight-forward syntax:</p>
+<pre><code>rx ry x-axis-rotation large-arc-flag sweep-flag x y
+</code></pre>
+<p>But if you read the EBNF grammar very carefully you will notice that
+<code>large-arc-flag</code> and <code>sweep-flag</code> do not require a space after them.</p>
+<pre><code>elliptical_arc_argument::=
+    number comma_wsp? number comma_wsp? number comma_wsp
+    flag comma_wsp? flag comma_wsp? coordinate_pair
+
+flag::=(&quot;0&quot;|&quot;1&quot;)
+</code></pre>
+<p>After all, they can be set to either 0 or 1, so we already know their length.
+Therefore:</p>
+<pre><code>A 5 5 30 1 1 10 20
+</code></pre>
+<p>is identical to:</p>
+<pre><code>A 5 5 30 1110 20
+</code></pre>
+<br>
+<p>Until recently, QtSvg did not supported it. And Batik would even crash in some cases.</p>
+<h2 id="curve-shorthands"><a class="header" href="#curve-shorthands">Curve shorthands</a></h2>
+<p>Quadratic and cubic curve segments allow a shorthand variant, in which case one
+of the coordinates can be skipped if it can be resolved from the previous segment.</p>
+<p>In the case of CurveTo shorthand (<code>S</code>):</p>
+<blockquote>
+<p>The first control point is assumed to be the reflection of the second control
+point on the previous command relative to the current point.</p>
+</blockquote>
+<p>Which basically means:</p>
+<pre><code>x1 = prev_x * 2 - prev_x2
+y1 = prev_y * 2 - prev_y2
+</code></pre>
+<p>This way</p>
+<pre><code>M 10 20 C 30 40 50 60 70 80 S 90 100 110 120
+</code></pre>
+<p>becomes:</p>
+<pre><code>M 10 20 C 30 40 50 60 70 80 C 90 100 90 100 110 120
+</code></pre>
+<p>because:</p>
+<pre><code>70 * 2 - 50 = 90
+80 * 2 - 60 = 100
+</code></pre>
+<br>
+<p>And a subcase of this is:</p>
+<blockquote>
+<p>If there is no previous command or if the previous command
+was not an C, c, S or s, assume the first control point is
+coincident with the current point.</p>
+</blockquote>
+<p>This way</p>
+<pre><code>M 10 20 S 30 40 50 60
+</code></pre>
+<p>becomes</p>
+<pre><code>M 10 20 C 10 20 30 40 50 60
+</code></pre>
+<br>
+<p>QuadraticTo shorthands work similarly to CurveTo shorthands,
+but instead of reflecting the x2/y2, they reflect x1/y1 one.</p>
+<br>
+<p>Note that during the simplification stage, the &quot;previous segment&quot; refers
+to the last simplified one and not the previous one in the original path data.
+Otherwise, when we have a mix of different curve shorthands we would get invalid results.</p>
+<p>Which is what Batik does in the case of:</p>
+<pre><code>M 30 30 T 40 170 S 170 170 170 30
+</code></pre>
+<p>which should be resolved to:</p>
+<pre><code>M 30 30 Q 30 30 40 170 C 40 170 170 170 170 30
+</code></pre>
+<p>while Batik produces this:</p>
+<p align="center">
+<img src="images/path-shorthands-batik-bug.png" width="600"/>
+</p>
+<p>This is a good illustration that even the most basic features, like path data,
+cannot be used in a reproducible way. Inevitably there will be a library or an app that would
+fail due to complexity.</p>
+<h2 id="trailing-data"><a class="header" href="#trailing-data">Trailing data</a></h2>
+<p>During parsing, any malformed data should simply end parsing of the current path data.
+So in case of something like <code>M 10 20 L 30 40 abcdef</code> a proper parser should
+return <code>M 10 20 L 30 40</code> and maybe print a warning. A parser should not ignore the already parsed
+data. It should not skip elements with malformed path data.
+Neither it should abort parsing of the whole document.</p>
+<p>This may sound like an obvious behavior, but Batik 1.16 will abort the file parsing completely
+and throw an error. And Inkscape 1.2 will ignore the whole path.</p>
+<h2 id="duplicated-closepath-segments"><a class="header" href="#duplicated-closepath-segments">Duplicated ClosePath segments</a></h2>
+<p>To close a subpath, SVG uses the ClosePath (<code>Z</code>) segment.
+Stroking of:</p>
+<pre><code>M 0 50 L 50 0 L 100 50
+</code></pre>
+<p>will produce two lines. But</p>
+<p><code>M 0 50 L 50 0 L 100 50 Z</code></p>
+<p>will produce a triangle.</p>
+<br>
+<p>And no one stops you from having as many repeated ClosePath segment as you want.
+But only one <em>must</em> remain. So:</p>
+<pre><code>M 0 50 L 50 0 L 100 50 Z Z Z Z Z Z
+</code></pre>
+<p>should simplifying just to:</p>
+<pre><code>M 0 50 L 50 0 L 100 50 Z
+
+</code></pre>
+<p>By the spec, consecutive ClosePaths are no-op. Meaning <code>Z Z Z Z</code> is the same as <code>Z</code>.
+The important part here is that removal of duplicated ClosePaths should be done before
+markers resolving. The <code>marker-mid</code> property should be applied to each segment.
+And if you still have multiple ClosePaths you may end up with something like this:</p>
+<div class="table-wrapper"><table><thead><tr><th>Correct</th><th>Incorrect</th></tr></thead><tbody>
+<tr><td><img src="images/duplicated-close-paths-ok.png" width="200" height="200"></td><td><img src="images/duplicated-close-paths-invalid.png" width="200" height="200"></td></tr>
+</tbody></table>
+</div>
+<p>And while markers in general are poorly supported, this case trips even browsers:</p>
+<p><img src="images/duplicated-close-paths-diff.png" alt="" /></p>
+<p>Here, only resvg, Batik and Inkscape are correct.</p>
+<h2 id="arcto-to-curvetos"><a class="header" href="#arcto-to-curvetos">ArcTo to CurveTos</a></h2>
+<p>Most 2D libraries do not provide an API to append SVG Arcs to a path.
+Some 2D libraries do have <code>arc_to</code> methods, but SVG arcs are a bit special.
+Therefore most SVG parsers would convert Arcs to Curves themselves.</p>
+<p>And since it's on this list - you know it's bad. In fact, it's a surprisingly hard task.
+And of course, the SVG spec doesn't define it in any way.</p>
+<p>To make things worse, there are multiple ways you can do this and each of them
+would take 200-300 lines of code.</p>
+<!-- TODO: find a code sample somewhere -->
+<h2 id="markers-on-arcto"><a class="header" href="#markers-on-arcto">Markers on ArcTo</a></h2>
+<p>Continuing the previous section, ArcTo to CurvesTo conversion hides another issue.
+Usually, a single ArcTo would be converted into multiple CurveTos. Getting just one is pretty rare.
+Which means the number of segments in our path has changed.
+Why does it matter? Because of <code>marker-mid</code>.</p>
+<p><code>marker-mid</code> attribute allows us to draw a marker at each segment end
+(yes, confusing, I know, but this is what <em>mid</em> means in this context.
+<code>marker-end</code> means the end of the path, not a segment).
+And if the number of segments has changed, we could get something like this:</p>
+<p align="center">
+<img src="images/marker-mid-on-arcto.png" width="500"/>
+</p>
+<p>resvg and Safari would fail to render this correctly. I personally still have no idea how to preserve
+the original segment ends. Since it would require to resolve markers before paths simplification.
+Which doesn't make any sense.</p>
+<!-- TODO: numbers parsing section -->
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="inheritance.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="isolated-groups.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="inheritance.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="isolated-groups.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

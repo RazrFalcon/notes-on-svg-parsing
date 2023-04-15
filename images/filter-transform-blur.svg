@@ -1,0 +1,7 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="198" height="198" fill="white" stroke="black"/>
+    <filter id="filter1">
+        <feGaussianBlur stdDeviation="12 0"/>
+    </filter>
+    <rect x="80" y="10" width="80" height="80" fill="seagreen" filter="url(#filter1)" transform="rotate(45 60 60)"/>
+</svg>

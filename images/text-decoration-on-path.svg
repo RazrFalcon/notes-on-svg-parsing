@@ -1,0 +1,13 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect x="1" y="1" width="198" height="198" fill="white" stroke="black"/>
+    <path id="path1" fill="none" stroke="gray"
+          d="M 40 100 A 60 60 0 0 1 100 40 60 60 0 0 1 160 100 60 60 0 0 1 100 160 60 60 0 0 1 40 100 Z"/>
+    <g text-decoration="overline" fill="red">
+        <text font-family="Mplus 1p" font-size="22" writing-mode="tb" fill="black">
+            <textPath xlink:href="#path1">
+                非常に長いテキ
+            </textPath>
+            スト。
+        </text>
+    </g>
+</svg>

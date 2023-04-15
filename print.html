@@ -1,0 +1,1728 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Notes on SVG parsing</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Intro</a></li><li class="chapter-item expanded "><a href="the-root-of-the-problem.html"><strong aria-hidden="true">2.</strong> The root of the problem</a></li><li class="chapter-item expanded "><a href="relative-units.html"><strong aria-hidden="true">3.</strong> Relative units</a></li><li class="chapter-item expanded "><a href="rx-ry.html"><strong aria-hidden="true">4.</strong> rx/ry attributes resolving</a></li><li class="chapter-item expanded "><a href="length-parsing.html"><strong aria-hidden="true">5.</strong> Length parsing</a></li><li class="chapter-item expanded "><a href="inheritance.html"><strong aria-hidden="true">6.</strong> Attributes inheritance</a></li><li class="chapter-item expanded "><a href="path-data.html"><strong aria-hidden="true">7.</strong> Path data</a></li><li class="chapter-item expanded "><a href="isolated-groups.html"><strong aria-hidden="true">8.</strong> Isolated groups</a></li><li class="chapter-item expanded "><a href="gradients-resolving.html"><strong aria-hidden="true">9.</strong> Gradients resolving</a></li><li class="chapter-item expanded "><a href="recursive.html"><strong aria-hidden="true">10.</strong> Recursive references</a></li><li class="chapter-item expanded "><a href="empty-groups.html"><strong aria-hidden="true">11.</strong> Renderable empty groups</a></li><li class="chapter-item expanded "><a href="zero-length-paths.html"><strong aria-hidden="true">12.</strong> Zero-length paths</a></li><li class="chapter-item expanded "><a href="filter-transform.html"><strong aria-hidden="true">13.</strong> Filter transform</a></li><li class="chapter-item expanded "><a href="auto-size.html"><strong aria-hidden="true">14.</strong> Automatic document size</a></li><li class="chapter-item expanded "><a href="stroke-fallback.html"><strong aria-hidden="true">15.</strong> Stroke paint fallback</a></li><li class="chapter-item expanded "><a href="svg2-presentation.html"><strong aria-hidden="true">16.</strong> Presentation attributes in SVG 2</a></li><li class="chapter-item expanded "><a href="text/index.html"><strong aria-hidden="true">17.</strong> Text</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="text/character.html"><strong aria-hidden="true">17.1.</strong> A character</a></li><li class="chapter-item expanded "><a href="text/chunks.html"><strong aria-hidden="true">17.2.</strong> Text chunks</a></li><li class="chapter-item expanded "><a href="text/whitespaces.html"><strong aria-hidden="true">17.3.</strong> Whitespaces handling</a></li><li class="chapter-item expanded "><a href="text/bbox.html"><strong aria-hidden="true">17.4.</strong> Bounding box</a></li><li class="chapter-item expanded "><a href="text/language.html"><strong aria-hidden="true">17.5.</strong> Language</a></li><li class="chapter-item expanded "><a href="text/letter-spacing.html"><strong aria-hidden="true">17.6.</strong> letter-spacing</a></li><li class="chapter-item expanded "><a href="text/text-decoration.html"><strong aria-hidden="true">17.7.</strong> text-decoration</a></li><li class="chapter-item expanded "><a href="text/text-anchor.html"><strong aria-hidden="true">17.8.</strong> text-anchor</a></li><li class="chapter-item expanded "><a href="text/fill-rule.html"><strong aria-hidden="true">17.9.</strong> fill-rule</a></li></ol></li><li class="chapter-item expanded "><a href="use/index.html"><strong aria-hidden="true">18.</strong> The use element</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="use/use-to-symbol.html"><strong aria-hidden="true">18.1.</strong> use to symbol</a></li><li class="chapter-item expanded "><a href="use/use-to-svg-size-resolving.html"><strong aria-hidden="true">18.2.</strong> use to svg size resolving</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Notes on SVG parsing</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="intro"><a class="header" href="#intro">Intro</a></h1>
+<p>After working on my SVG rendering library (<a href="https://github.com/RazrFalcon/resvg">resvg</a>)
+for the past 6 years, and working closely with SVG for the past 10, I've thought
+that this is enough time to have some interesting insight worth sharing.
+And there are definitely a lot to talk about.</p>
+<p>When people think SVG, they usually imagine something like this:</p>
+<pre><code class="language-xml">&lt;svg viewBox=&quot;0 0 200 200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+    &lt;rect x=&quot;20&quot; y=&quot;20&quot; width=&quot;160&quot; height=&quot;160&quot; fill=&quot;green&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>A very simple, user-friendly, XML-based vector file format.</p>
+<p>And while SVG is indeed designed to be easy to read and write by a human,
+parsing and rendering of it are notoriously hard for a machine.
+The SVG spec is 20 years old and there are still no libraries
+that support even 80% of it. Yes, after 20 years one still cannot <em>just render</em> an SVG.</p>
+<p>Whenever I receive bug reports for my SVG library,
+people often use the phrase &quot;my SVG isn't rendering <em>correctly</em>&quot;.
+Which cracks me up every time. There is no such thing as a <em>correctly</em> rendered SVG.
+As soon as you start using &quot;advanced&quot; features such as text, filters, or, God forbid,
+animations - it would simply not work. Never.
+And even if you will manage to make it work, as soon as you try a different render - it
+will fall apart again.</p>
+<p>The idea behind this &quot;book&quot; is to answer the popular question of &quot;how hard can it be?&quot;.
+A reader expected to have some prior knowledge about SVG, but it should be a fun read either way.</p>
+<p>I'm trying my best not to fall into a rant, but when it comes to SVG - it's really hard.</p>
+<p><strong>NOTE:</strong> English is not my native language, so this &quot;book&quot; will probably be hard to digest.
+And this is on top of the complexity of the subject itself.</p>
+<p><strong>NOTE:</strong> This &quot;book&quot; isn't finished and still work in progress.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="the-root-of-the-problem"><a class="header" href="#the-root-of-the-problem">The root of the problem</a></h1>
+<p>So why it's so hard to parse and render SVG?</p>
+<p>In my opinion, the main issue is the lack of a reference implementation.
+No one actually knows how SVG suppose to work.
+By writing a reference implementation, including a test suite,
+a lot of issues described in this &quot;book&quot; would never happen.</p>
+<p>Instead, we have Chrome. It probably supports around 80% of the spec.
+Which is not that great, but the best we got so far.
+And good luck figuring out how it works. It's a huge codebase
+and even finding the right source file could be challenging.</p>
+<p>As for a test suite, SVG 1.1 actually had one. A very rudimentary, but still.
+And SVG 2 has some SVG-inside-HTML tests, which are impossible to use outside a browser.
+I have ended up writing <a href="https://github.com/RazrFalcon/resvg-test-suite">my own test suite</a>.
+It's far from being complete but already includes 1500 tests.
+Which should give you a hint about the monstrosity we're dealing with.</p>
+<p>Asking the SVG Working Group is not an option either.
+I have <a href="https://github.com/w3c/svgwg/issues?q=is%3Aissue+author%3ARazrFalcon">contacted them</a>
+multiple times during <code>resvg</code> development
+and the most common answer I've got was &quot;we don't know&quot;.
+Which wouldn't be a thing if we had a reference implementation.</p>
+<p>In the end, I genuinely believe that it's simply <em>impossible</em> to implement the whole SVG spec.
+There is just too much of it.</p>
+<br>
+<p>Maybe we should <em>just</em> use something else? You might ask. Like what?<br>
+The only open-ish SVG alternative is PDF. Which is a nightmare on its own,
+while being conceptually simpler, since it doesn't have
+a text layout, filters/effects, animations and events.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="relative-units"><a class="header" href="#relative-units">Relative units</a></h1>
+<p>Just like HTML/CSS, SVG supports <a href="https://www.w3.org/TR/css-values-3/#relative-lengths">relative units</a>.
+In fact, SVG 2 supports the same units HTML/CSS does.
+So the logic can overlap between SVG and HTML.</p>
+<p>And while absolute units (like <code>mm</code>) are pretty simple - just a multiplication factor based on the
+<a href="https://en.wikipedia.org/wiki/Dots_per_inch">DPI</a>,
+relative require a much more complex logic.</p>
+<h2 id="percent-units"><a class="header" href="#percent-units">Percent units</a></h2>
+<p>While percent units may look simple, after all, % can be treated just as a factor
+(e.g. 200% is the same as 2x).
+But in reality, they are quite complicated. And mainly because of the base value
+they are <em>relative to</em>.</p>
+<p>Let's take opacity for example: <code>opacity=&quot;50%&quot;</code>. What is it relative to? Technically, to itself.
+Or more specifically to 1. So 50% equals 0.5 and 100% equals 1.
+And values outside the 0..1 range are clamped.</p>
+<p>What about the rectangle's width? It's relative to the parent SVG element's <code>viewBox</code>
+(<em>parent</em>, not the <em>root</em> one, and <code>viewBox</code>, not <code>width</code>/<code>height</code>). So in the case of:</p>
+<pre><code class="language-xml">&lt;svg width=&quot;100&quot; viewBox=&quot;0 0 50 50&quot;&gt;
+    &lt;rect width=&quot;50%&quot; height=&quot;20&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>our <code>width</code> is 25.</p>
+<p>And it gets weirder since a <code>use</code> element can enforce the <code>svg</code> viewbox as well when no
+<code>viewBox</code> was set. So in the case of:</p>
+<pre><code class="language-xml">&lt;svg id=&quot;svg1&quot; width=&quot;100&quot;&gt;
+    &lt;rect width=&quot;50%&quot; height=&quot;20&quot;/&gt;
+&lt;/svg&gt;
+&lt;use xlink:href=&quot;#svg1&quot; width=&quot;50&quot;&gt;
+</code></pre>
+<p>our <code>width</code> is again 25. Because we have to use the width from the <code>use</code> element.
+You can find more about it in the
+<a href="./use/use-to-svg-size-resolving.html"><code>use</code> to <code>svg</code> size resolving</a> chapter.</p>
+<br>
+<p>What about <code>stroke-width</code>? Well, it's relative to the <em>diagonal length</em> of the current viewbox.
+Aka <code>sqrt((width^2 + height^2) / 2)</code>. So in the case of:</p>
+<pre><code class="language-xml">&lt;svg viewBox=&quot;0 0 50 25&quot;&gt;
+    &lt;rect stroke-width=&quot;50%&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>it will be <code>sqrt((50^2 + 25^2) / 2) = 39.5</code>.</p>
+<br>
+<p>What about <code>font-size</code>? It's relative to the parent <code>font-size</code>. So in the case of:</p>
+<pre><code class="language-xml">&lt;g font-size=&quot;20&quot;&gt;
+    &lt;text font-size=&quot;50%&quot;/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>our font size is 10.</p>
+<h2 id="font-units"><a class="header" href="#font-units">Font units</a></h2>
+<p><code>font-size</code> and font units (<code>em</code> and <code>ex</code>) make our lives even worse.</p>
+<p>First, <code>font-size</code> can have
+<a href="https://www.w3.org/TR/2008/REC-CSS2-20080411/fonts.html#propdef-font-size">named values</a>,
+like <code>larger</code> or <code>medium</code>.
+It can also have percent units, which are relative to the parent <code>font-size</code>
+and not the current viewbox.</p>
+<p>Second, font relative units have to be resolved from the root element to the current one
+and not the other way around, like with other relative units. So in the case of:</p>
+<pre><code class="language-xml">&lt;svg&gt;
+    &lt;g font-size=&quot;20&quot;&gt;
+        &lt;g font-size=&quot;200%&quot;&gt;
+            &lt;g font-size=&quot;larger&quot;&gt;
+                &lt;rect width=&quot;0.5em&quot; height=&quot;0.5ex&quot;/&gt;
+            &lt;/g&gt;
+        &lt;/g&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>our width and height are 24 and 12 respectively. Why? Because of the following steps
+(from top to bottom):</p>
+<ul>
+<li>20</li>
+<li>20 * 200% = 40</li>
+<li>40 * 1.2 = 48 (<code>larger</code> has a scaling factor of 1.2, don't ask why...)</li>
+<li>width: 48 * 0.5 = 24</li>
+<li>height: (48 * 0.5) / 2 = 12</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="rxry-attributes-resolving"><a class="header" href="#rxry-attributes-resolving"><code>rx</code>/<code>ry</code> attributes resolving</a></h1>
+<p>In SVG, rectangle corners can be rounded by setting <code>rx</code> and <code>ry</code> attributes. Like this:</p>
+<pre><code class="language-xml">&lt;rect x=&quot;5&quot; y=&quot;5&quot; width=&quot;10&quot; height=&quot;10&quot; rx=&quot;2&quot; ry=&quot;2&quot;/&gt;
+</code></pre>
+<p>duplicated radiuses. So instead of <code>rx=&quot;2&quot; ry=&quot;2&quot;</code> you can write just <code>rx=&quot;2&quot;</code> or <code>ry=&quot;2&quot;</code>.
+And the &quot;missing&quot; value will be copied from the present one. Pretty nice.</p>
+<p>Of course, it wouldn't be in this &quot;book&quot; if it was that easy.
+Remember that SVG supports <a href="./relative-units.html">relative units</a>,
+like <code>mm</code>, <code>em</code> and <code>%</code>, which you have to convert into absolute before rendering?
+The question is, what should be done first: resolving the missing attribute
+or relative to absolute unit conversion? The spec doesn't say.</p>
+<p>But who cares! It couldn't be that bad, right? Well... Let's take a look at this example:</p>
+<pre><code class="language-xml">&lt;svg viewBox=&quot;0 0 20 50&quot;&gt;
+    &lt;rect width=&quot;10&quot; height=&quot;10&quot; rx=&quot;50%&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>To what values <code>rx</code> and <code>ry</code> should be resolved?
+If we copy the missing radius first, then we will get <code>rx=&quot;50%&quot; ry=&quot;50%&quot;</code>
+and therefore <code>rx=&quot;10&quot; ry=&quot;25&quot;</code> (via <code>svg.viewBox.width * 50%</code> and <code>svg.viewBox.height * 50%</code>).
+Otherwise it will be <code>rx=&quot;10&quot; ry=&quot;10&quot;</code>.</p>
+<p>The answer is the latter.
+A parser is suppose to convert units first and only then copy the present value.</p>
+<p>Neat! But surely no one actually made such mistake, right?
+Well, Batik 1.16, a 20 years old library, still has this bug.
+My <code>resvg</code> library had this bug for 5 years until I accidentally stumbled onto it while fixing
+an unrelated issue.</p>
+<p>A tiny bug that is almost impossible to hit, but that's what you get when you have a file format
+with countless interconnected features and no test suite.</p>
+<br>
+<p>Since SVG 2, this logic affects <code>ellipse</code> as well.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="length-parsing"><a class="header" href="#length-parsing">Length parsing</a></h1>
+<p>The <a href="https://www.w3.org/TR/css-values/#lengths">length type</a> is essentially
+a number + unit pair. Like <code>10mm</code> or <code>5%</code>. Nothing too crazy.</p>
+<p>From the parsing perspective it doesn't look that hard either.
+Most languages have something like a <code>string_to_number</code> function,
+which in most cases would return the position of the last parsed digit,
+making the unit suffix parsing trivial.</p>
+<p>The problem is that we cannot use those functions in SVG. And CSS in general.
+Why? Because of font units, aka <code>em</code> and <code>ex</code>.</p>
+<p>Remember that SVG/CSS allows exponent notion in numbers.
+Meaning that <code>1e5</code> is a perfectly valid number.
+Now, if we try to parse <code>5em</code>, there is a great chance that our language-provided
+function would fail, because this is not the correct exponent notation,
+but still a valid SVG length. Same with <code>1e5em</code>.</p>
+<p>Because of this, most SVG parsers had to implement a custom numbers parsing.
+And usually it's enough to simply have a function that would properly split
+length into number (string representation) and suffix. And we can then pass
+the separated number to the <code>string_to_number</code> function of choice.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="attributes-inheritance"><a class="header" href="#attributes-inheritance">Attributes inheritance</a></h1>
+<p>SVG is all about simplifying the life of an author who writes SVG by hand.
+One of such features is attributes inheritance.</p>
+<p>Instead of writing:</p>
+<pre><code class="language-xml">&lt;rect fill=&quot;green&quot;/&gt;
+&lt;rect fill=&quot;green&quot;/&gt;
+</code></pre>
+<p>we can write</p>
+<pre><code class="language-xml">&lt;g fill=&quot;green&quot;&gt;
+    &lt;rect/&gt;
+    &lt;rect/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>and both rectangles will <em>inherit</em> the <code>fill</code> attribute value.</p>
+<p>As expected, this simple idea leads to death by a thousand cuts.</p>
+<p>First, not all properties/attributes are inheritable.
+For example, <code>fill-opacity</code> is inheritable, but <code>opacity</code> isn't.
+You can find the whole list <a href="https://www.w3.org/TR/SVG11/propidx.html">here</a>
+(see the <em>Inh.</em> column).</p>
+<p>Second, for some reason, inheritance can be stated explicitly, like this:</p>
+<pre><code class="language-xml">&lt;g fill=&quot;green&quot;&gt;
+    &lt;rect fill=&quot;inherit&quot;/&gt;
+    &lt;rect/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>This would produce the same output as before, but makes parsing harder.</p>
+<p>Third, some non-inheritable properties can be inherited explicitly
+via the <code>inherit</code> keyword, but only from the direct parent element.<br>
+For example:</p>
+<pre><code class="language-xml">&lt;g opacity=&quot;0.5&quot;&gt;
+    &lt;rect/&gt; &lt;!-- opacity=1 --&gt;
+    &lt;rect opacity='inherit'/&gt; &lt;!-- opacity=0.5, effectively 0.25 --&gt;
+    &lt;g&gt; &lt;!-- opacity=1 --&gt;
+        &lt;rect opacity='inherit'/&gt; &lt;!-- opacity=1, effectively 0.5 --&gt;
+    &lt;/g&gt;
+    &lt;g opacity='inherit'&gt; &lt;!-- opacity=0.5, effectively 0.25 --&gt;
+        &lt;rect opacity='inherit'/&gt; &lt;!-- opacity=0.5, effectively 0.125 --&gt;
+    &lt;/g&gt;
+&lt;/g&gt;
+</code></pre>
+<br>
+<p>Fourth, when the <code>inherit</code> keyword is used, but no parent element had defined this property,
+the default value should be used.</p>
+<br>
+<p>All of this can lead to some bizarre and unexpected cases like:</p>
+<pre><code class="language-xml">&lt;g stop-color=&quot;red&quot;&gt;
+    &lt;linearGradient id=&quot;lg1&quot; stop-color=&quot;green&quot;&gt;
+        &lt;stop offset=&quot;0&quot;/&gt;
+        &lt;stop offset=&quot;1&quot; stop-color=&quot;inherit&quot;/&gt;
+    &lt;/linearGradient&gt;
+&lt;/g&gt;
+</code></pre>
+<p>Here, the first stop would be black (default value, because <code>stop-color</code> is non-inheritable)
+and the second stop would be green (explicitly inherited from the parent).
+And the <code>stop-color</code> on <code>g</code> has no effect, because it's non-inheritable.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="path-data"><a class="header" href="#path-data">Path data</a></h1>
+<p><a href="https://www.w3.org/TR/SVG2/paths.html#PathData">SVG path data</a>,
+aka the <code>d</code> attribute in the <code>path</code> element, deserves its own book. This is how complicated it is.</p>
+<p>Sure, in most cases you will see something like <code>M 100 100 L 200 200</code> and it doesn't look
+that bad. But <code>M10-20A5.5.3-4 110-.1</code> is a perfectly valid SVG path as well.
+How is it possible? Let's find out!</p>
+<h2 id="basics"><a class="header" href="#basics">Basics</a></h2>
+<p>While the <a href="https://www.w3.org/TR/SVG2/paths.html#PathData">SVG path data</a> section of the spec
+details everything nicely, here are some basic terminology:</p>
+<ul>
+<li><em>command</em> - upper or lower case M, L, H, V, C, S, Q, T, A and Z character</li>
+<li><em>coordinate</em> - a number, usually a pair</li>
+<li><em>segment</em> - a pair of a (potentially implicit) <em>command</em> and <em>coordinates</em></li>
+<li><em>subpath</em> - a list of <em>segments</em> starting from MoveTo and ending with ClosePath, a new MoveTo
+or the end of the data</li>
+<li><em>path</em> - a list of <em>subpaths</em></li>
+</ul>
+<h2 id="parsing-steps"><a class="header" href="#parsing-steps">Parsing steps</a></h2>
+<p>Path data parsing can be split into two steps: parsing/tokenization of the original segments
+(absolute, relative, implicit, shorthands)
+and simplification of them to leave only the basic segments (move, line, curve, close)
+in absolute coordinates.</p>
+<p>The <em>simplification</em> step is important, since SVG path data notation is far more complex
+then a typical 2D library API would allow. That's what this chapter about.</p>
+<h2 id="implicit-sequential-commands"><a class="header" href="#implicit-sequential-commands">Implicit sequential commands</a></h2>
+<p>If a path has multiple sequential segments of the same type, like:</p>
+<pre><code>M 10 20 H 10 H 20 H 30 V 40
+</code></pre>
+<p>SVG allows us to specify the command only the first time, like:</p>
+<pre><code>M 10 20 H 10 20 30 V 40
+</code></pre>
+<h2 id="implicit-sequential-moveto-commands"><a class="header" href="#implicit-sequential-moveto-commands">Implicit sequential MoveTo commands</a></h2>
+<p>If we take the idea above and apply it to MoveTo (<code>M</code>) segments it <em>will not</em> produce
+the output you would expect.</p>
+<p>In SVG, the following path will produce nothing since a single subpath must have
+at least two segments. And here we have two subpaths with a single segment.
+And no, this is not two <a href="./zero-length-paths.html">zero-length subpaths</a>.</p>
+<pre><code>M 10 20 M 30 40
+</code></pre>
+<br>
+<p>But the following path will produce a line. Why?!
+Because an implicit command after MoveTo is treated as LineTo and not MoveTo. Yeah...</p>
+<pre><code>M 10 20 30 40
+</code></pre>
+<p>Is the same as:</p>
+<pre><code>M 10 20 L 30 40
+</code></pre>
+<br>
+<p>And we're not done yet. The implicit LineTo command is affected by MoveTo's absolute/relative state.
+Meaning that:</p>
+<pre><code>m 10 20 30 40
+</code></pre>
+<p>is</p>
+<pre><code>m 10 20 l 30 40
+</code></pre>
+<p>and not</p>
+<pre><code>m 10 20 L 30 40
+</code></pre>
+<h2 id="implicit-moveto-segment-after-closepath"><a class="header" href="#implicit-moveto-segment-after-closepath">Implicit MoveTo segment after ClosePath</a></h2>
+<p>And we're not done with MoveTo yet. If you read the spec extremely carefully,
+you will notice the following line:</p>
+<blockquote>
+<p>If a &quot;closepath&quot; is followed immediately by any other command,
+then the next subpath starts at the same initial point as the current subpath.</p>
+</blockquote>
+<p>Which means that:</p>
+<pre><code>M 10 20 L 30 40 Z L 50 60
+</code></pre>
+<p>is identical to:</p>
+<pre><code>M 10 20 L 30 40 Z M 10 20 L 50 60
+</code></pre>
+<p>and it's not an error.</p>
+<br>
+<p>What is interesting is that path data <em>must</em> start with a MoveTo segment.
+Meaning that the following path is invalid:</p>
+<pre><code>L 30 40
+</code></pre>
+<p>and <em>must not</em> be treated as</p>
+<pre><code>M 0 0 L 30 40
+</code></pre>
+<p>or something like that.</p>
+<p>And surprise-surprise, some libraries do that. Specifically Batik and QtSvg.</p>
+<h2 id="relative-moveto-segment-after-closepath"><a class="header" href="#relative-moveto-segment-after-closepath">Relative MoveTo segment after ClosePath</a></h2>
+<p>A relative MoveTo segment after ClosePath is relative to the previous MoveTo segment
+since ClosePath moved the current coordinate to it.</p>
+<p>It might not look like that big of a problem, but depending of how you're parsing the path data
+you might use the previous MoveTo coordinate directly, which is incorrect.
+The previous <em>absolute</em> MoveTo coordinate must be used.</p>
+<p>Meaning that in the case of:</p>
+<pre><code>M 10 20 L 30 40
+m 50 60 L 70 80 Z
+m 90 100 L 110 120
+</code></pre>
+<p>the second MoveTo is relative to the current position, i.e. 30,40 + 50,60.
+And the third MoveTo is relative to the <em>absolute</em> second MoveTo, i.e. 30,40 + 50,60 + 90,100</p>
+<h2 id="arcto-flags"><a class="header" href="#arcto-flags">ArcTo flags</a></h2>
+<p>The <a href="https://www.w3.org/TR/SVG2/paths.html#PathDataEllipticalArcCommands">ArcTo</a> segment has
+a pretty straight-forward syntax:</p>
+<pre><code>rx ry x-axis-rotation large-arc-flag sweep-flag x y
+</code></pre>
+<p>But if you read the EBNF grammar very carefully you will notice that
+<code>large-arc-flag</code> and <code>sweep-flag</code> do not require a space after them.</p>
+<pre><code>elliptical_arc_argument::=
+    number comma_wsp? number comma_wsp? number comma_wsp
+    flag comma_wsp? flag comma_wsp? coordinate_pair
+
+flag::=(&quot;0&quot;|&quot;1&quot;)
+</code></pre>
+<p>After all, they can be set to either 0 or 1, so we already know their length.
+Therefore:</p>
+<pre><code>A 5 5 30 1 1 10 20
+</code></pre>
+<p>is identical to:</p>
+<pre><code>A 5 5 30 1110 20
+</code></pre>
+<br>
+<p>Until recently, QtSvg did not supported it. And Batik would even crash in some cases.</p>
+<h2 id="curve-shorthands"><a class="header" href="#curve-shorthands">Curve shorthands</a></h2>
+<p>Quadratic and cubic curve segments allow a shorthand variant, in which case one
+of the coordinates can be skipped if it can be resolved from the previous segment.</p>
+<p>In the case of CurveTo shorthand (<code>S</code>):</p>
+<blockquote>
+<p>The first control point is assumed to be the reflection of the second control
+point on the previous command relative to the current point.</p>
+</blockquote>
+<p>Which basically means:</p>
+<pre><code>x1 = prev_x * 2 - prev_x2
+y1 = prev_y * 2 - prev_y2
+</code></pre>
+<p>This way</p>
+<pre><code>M 10 20 C 30 40 50 60 70 80 S 90 100 110 120
+</code></pre>
+<p>becomes:</p>
+<pre><code>M 10 20 C 30 40 50 60 70 80 C 90 100 90 100 110 120
+</code></pre>
+<p>because:</p>
+<pre><code>70 * 2 - 50 = 90
+80 * 2 - 60 = 100
+</code></pre>
+<br>
+<p>And a subcase of this is:</p>
+<blockquote>
+<p>If there is no previous command or if the previous command
+was not an C, c, S or s, assume the first control point is
+coincident with the current point.</p>
+</blockquote>
+<p>This way</p>
+<pre><code>M 10 20 S 30 40 50 60
+</code></pre>
+<p>becomes</p>
+<pre><code>M 10 20 C 10 20 30 40 50 60
+</code></pre>
+<br>
+<p>QuadraticTo shorthands work similarly to CurveTo shorthands,
+but instead of reflecting the x2/y2, they reflect x1/y1 one.</p>
+<br>
+<p>Note that during the simplification stage, the &quot;previous segment&quot; refers
+to the last simplified one and not the previous one in the original path data.
+Otherwise, when we have a mix of different curve shorthands we would get invalid results.</p>
+<p>Which is what Batik does in the case of:</p>
+<pre><code>M 30 30 T 40 170 S 170 170 170 30
+</code></pre>
+<p>which should be resolved to:</p>
+<pre><code>M 30 30 Q 30 30 40 170 C 40 170 170 170 170 30
+</code></pre>
+<p>while Batik produces this:</p>
+<p align="center">
+<img src="images/path-shorthands-batik-bug.png" width="600"/>
+</p>
+<p>This is a good illustration that even the most basic features, like path data,
+cannot be used in a reproducible way. Inevitably there will be a library or an app that would
+fail due to complexity.</p>
+<h2 id="trailing-data"><a class="header" href="#trailing-data">Trailing data</a></h2>
+<p>During parsing, any malformed data should simply end parsing of the current path data.
+So in case of something like <code>M 10 20 L 30 40 abcdef</code> a proper parser should
+return <code>M 10 20 L 30 40</code> and maybe print a warning. A parser should not ignore the already parsed
+data. It should not skip elements with malformed path data.
+Neither it should abort parsing of the whole document.</p>
+<p>This may sound like an obvious behavior, but Batik 1.16 will abort the file parsing completely
+and throw an error. And Inkscape 1.2 will ignore the whole path.</p>
+<h2 id="duplicated-closepath-segments"><a class="header" href="#duplicated-closepath-segments">Duplicated ClosePath segments</a></h2>
+<p>To close a subpath, SVG uses the ClosePath (<code>Z</code>) segment.
+Stroking of:</p>
+<pre><code>M 0 50 L 50 0 L 100 50
+</code></pre>
+<p>will produce two lines. But</p>
+<p><code>M 0 50 L 50 0 L 100 50 Z</code></p>
+<p>will produce a triangle.</p>
+<br>
+<p>And no one stops you from having as many repeated ClosePath segment as you want.
+But only one <em>must</em> remain. So:</p>
+<pre><code>M 0 50 L 50 0 L 100 50 Z Z Z Z Z Z
+</code></pre>
+<p>should simplifying just to:</p>
+<pre><code>M 0 50 L 50 0 L 100 50 Z
+
+</code></pre>
+<p>By the spec, consecutive ClosePaths are no-op. Meaning <code>Z Z Z Z</code> is the same as <code>Z</code>.
+The important part here is that removal of duplicated ClosePaths should be done before
+markers resolving. The <code>marker-mid</code> property should be applied to each segment.
+And if you still have multiple ClosePaths you may end up with something like this:</p>
+<div class="table-wrapper"><table><thead><tr><th>Correct</th><th>Incorrect</th></tr></thead><tbody>
+<tr><td><img src="images/duplicated-close-paths-ok.png" width="200" height="200"></td><td><img src="images/duplicated-close-paths-invalid.png" width="200" height="200"></td></tr>
+</tbody></table>
+</div>
+<p>And while markers in general are poorly supported, this case trips even browsers:</p>
+<p><img src="images/duplicated-close-paths-diff.png" alt="" /></p>
+<p>Here, only resvg, Batik and Inkscape are correct.</p>
+<h2 id="arcto-to-curvetos"><a class="header" href="#arcto-to-curvetos">ArcTo to CurveTos</a></h2>
+<p>Most 2D libraries do not provide an API to append SVG Arcs to a path.
+Some 2D libraries do have <code>arc_to</code> methods, but SVG arcs are a bit special.
+Therefore most SVG parsers would convert Arcs to Curves themselves.</p>
+<p>And since it's on this list - you know it's bad. In fact, it's a surprisingly hard task.
+And of course, the SVG spec doesn't define it in any way.</p>
+<p>To make things worse, there are multiple ways you can do this and each of them
+would take 200-300 lines of code.</p>
+<!-- TODO: find a code sample somewhere -->
+<h2 id="markers-on-arcto"><a class="header" href="#markers-on-arcto">Markers on ArcTo</a></h2>
+<p>Continuing the previous section, ArcTo to CurvesTo conversion hides another issue.
+Usually, a single ArcTo would be converted into multiple CurveTos. Getting just one is pretty rare.
+Which means the number of segments in our path has changed.
+Why does it matter? Because of <code>marker-mid</code>.</p>
+<p><code>marker-mid</code> attribute allows us to draw a marker at each segment end
+(yes, confusing, I know, but this is what <em>mid</em> means in this context.
+<code>marker-end</code> means the end of the path, not a segment).
+And if the number of segments has changed, we could get something like this:</p>
+<p align="center">
+<img src="images/marker-mid-on-arcto.png" width="500"/>
+</p>
+<p>resvg and Safari would fail to render this correctly. I personally still have no idea how to preserve
+the original segment ends. Since it would require to resolve markers before paths simplification.
+Which doesn't make any sense.</p>
+<!-- TODO: numbers parsing section -->
+<div style="break-before: page; page-break-before: always;"></div><h1 id="isolated-groups"><a class="header" href="#isolated-groups">Isolated groups</a></h1>
+<p>Most people are familiar with the concept of layers from image editing applications
+like Photoshop. Where each shape, image and text are represented as individual layers
+and each of those layers can be arbitrarily grouped.<br>
+It's a pretty simple and intuitive idea. We essentially have a stack of images
+that are blended together to produce the final image.<br>
+And while SVG's XML structure may look like a tree of layers - it's not.</p>
+<p>Not only we do not render each SVG element into a dedicated image/layer -
+unless you have a powerful GPU and infinite RAM -
+we do not have layers to begin with.<br>
+When rendering SVG, we simply render each element directly to the main canvas
+without creating individual images/layers. Except for <em>isolated groups</em>.</p>
+<p>What is an <em>isolated group</em>? This is a very good and a very complicated question.<br>
+And first we have to understand what is an SVG group.</p>
+<p>An SVG group, aka the <code>&lt;g/&gt;</code> element, is technically just a syntax sugar.
+It allows us to visually group elements and/or propagate common properties.
+Meaning that:</p>
+<pre><code class="language-xml">&lt;g fill=&quot;green&quot;&gt;
+    &lt;rect/&gt;
+    &lt;rect/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>is semantically identical to:</p>
+<pre><code class="language-xml">&lt;rect fill=&quot;green&quot;/&gt;
+&lt;rect fill=&quot;green&quot;/&gt;
+</code></pre>
+<p>And for our renderer such a group is <a href="https://en.wikipedia.org/wiki/NOP_(code)">no-op</a>.
+We could skip it and simply render its children.</p>
+<p>On the other hand, clipping, masking, filters and opacity can be set only on groups.
+Yes, the ability to set the <code>opacity</code> attribute on other elements is just a syntax sugar.
+Meaning that:</p>
+<pre><code class="language-xml">&lt;rect opacity=&quot;0.5&quot;/&gt;
+</code></pre>
+<p>is technically:</p>
+<pre><code class="language-xml">&lt;g opacity=&quot;0.5&quot;&gt;
+    &lt;rect/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>And this time our renderer would create a temporary image, will draw a rectangle on it
+and then blend that image to the main canvas.</p>
+<p>A group that requires an image allocation is called <em>isolated</em>.
+It can be defined indirectly, by setting non-default
+<code>clip-path</code>, <code>mask</code>, <code>filter</code> and/or <code>opacity</code> attributes.
+Or directly, since SVG 2, by setting <code>style=&quot;isolation:isolate&quot;</code>.</p>
+<p>How bad can it be? Let's try to render a group with three circles and opacity:</p>
+<pre><code class="language-xml">&lt;g opacity=&quot;0.5&quot;&gt;
+    &lt;circle id=&quot;circle1&quot; cx=&quot;100&quot; cy=&quot;70&quot; r=&quot;50&quot; fill=&quot;#f00&quot;/&gt;
+    &lt;circle id=&quot;circle2&quot; cx=&quot;70&quot; cy=&quot;110&quot; r=&quot;50&quot; fill=&quot;#0f0&quot;/&gt;
+    &lt;circle id=&quot;circle3&quot; cx=&quot;130&quot; cy=&quot;110&quot; r=&quot;50&quot; fill=&quot;#00f&quot;/&gt;
+&lt;/g&gt;
+</code></pre>
+<p align="center">
+<img src="images/group-opacity-1.png" width="200"/>
+</p>
+<p>If we ignore the group isolation and simply apply opacity to each circle we would get:</p>
+<p align="center">
+<img src="images/group-opacity-2.png" width="200"/>
+</p>
+<p>Funnily enough, this is exactly what QtSvg does. It doesn't support isolation.
+Probably for performance reasons.</p>
+<br>
+<p>You can find more details in the <a href="https://www.w3.org/TR/SVG2/render.html">spec</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="gradients-resolving"><a class="header" href="#gradients-resolving">Gradients resolving</a></h1>
+<p>A typical gradient in SVG looks like this:</p>
+<pre><code class="language-xml">&lt;linearGradient id=&quot;lg1&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot;/&gt;
+&lt;/linearGradient&gt;
+</code></pre>
+<p>But SVG allows one gradient to reference another via the <code>href</code> attribute.
+When used, gradient's missing stop elements and attributes will be copied from a referenced gradient.</p>
+<p>Most libraries are either bad at this or do not support this at all.</p>
+<h2 id="stops-resolving"><a class="header" href="#stops-resolving">Stops resolving</a></h2>
+<p>A gradient can reference stop elements from another gradient.
+The type of a gradient doesn't matter, meaning linear can reference radial and vise versa.
+Stops will be referenced only when the current gradient doesn't have any stops.
+Meaning that</p>
+<pre><code class="language-xml">&lt;linearGradient id=&quot;lg1&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot;/&gt;
+&lt;/linearGradient&gt;
+&lt;linearGradient id=&quot;lg2&quot; xlink:href=&quot;#lg1&quot;/&gt;
+</code></pre>
+<p>is identical to</p>
+<pre><code class="language-xml">&lt;linearGradient id=&quot;lg1&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot;/&gt;
+&lt;/linearGradient&gt;
+&lt;linearGradient id=&quot;lg2&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot;/&gt;
+&lt;/linearGradient&gt;
+</code></pre>
+<p>The <code>href</code> chain length is unlimited. A gradient can reference another
+gradient which references another one and so on until one of the gradients in a chain
+has non-zero stops.
+Like so:</p>
+<pre><code class="language-xml">&lt;linearGradient id=&quot;lg1&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;red&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;green&quot;/&gt;
+&lt;/linearGradient&gt;
+&lt;!-- lg1 stops are ignored, because lg2 already has stops --&gt;
+&lt;linearGradient id=&quot;lg2&quot; xlink:href=&quot;#lg1&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot;/&gt;
+&lt;/linearGradient&gt;
+&lt;linearGradient id=&quot;lg3&quot; xlink:href=&quot;#lg2&quot;/&gt; &lt;!-- stops from lg2 and not lg1 will be used --&gt;
+&lt;linearGradient id=&quot;lg4&quot; xlink:href=&quot;#lg3&quot;/&gt; &lt;!-- stops from lg2 via lg3 will be used  --&gt;
+</code></pre>
+<h2 id="attributes-resolving"><a class="header" href="#attributes-resolving">Attributes resolving</a></h2>
+<p>Similar rules apply to gradient attributes as well.
+If a gradient has a <code>href</code> link to another gradient and the referenced gradient
+has attributes not present in the current gradient - those attributes will be copied.</p>
+<p>But things are getting weird pretty fast. Some attributes can be copied only from
+a gradient of the same type. Specifically <code>x1</code>, <code>y1</code>, <code>x2</code> and <code>y2</code> <em>linear</em> gradient attributes
+can be copied only from other <em>linear</em> gradients. Even when one of gradients in the <code>href</code>
+chain is radial. And <code>cx</code>, <code>cy</code>, <code>fx</code>, <code>fy</code> and <code>r</code> <em>radial</em> gradient attributes
+can be copied only from other <em>radial</em> gradients. <br>
+But <code>gradientUnits</code>, <code>spreadMethod</code> and <code>gradientTransform</code> attributes
+can be copied from a gradient of any type.</p>
+<p>In this example, <code>lg1</code> will copy <code>spreadMethod</code> from <code>rg1</code>, but will ignore <code>y2</code>.</p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg1&quot; y2=&quot;1&quot; spreadMethod=&quot;reflect&quot;/&gt;
+&lt;linearGradient id=&quot;lg1&quot; xlink:href=&quot;#rg1&quot; x2=&quot;0.7&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot;/&gt;
+&lt;/linearGradient&gt;
+</code></pre>
+<br>
+<p>By extrapolating a bit, we can easily end up with something like this:</p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg1&quot; xlink:href=&quot;#rg2&quot; cx=&quot;0.5&quot;/&gt;
+&lt;radialGradient id=&quot;rg2&quot; xlink:href=&quot;#rg3&quot; spreadMethod=&quot;reflect&quot; fy=&quot;0.65&quot;/&gt;
+&lt;radialGradient id=&quot;rg3&quot; cy=&quot;0.55&quot;/&gt;
+&lt;radialGradient id=&quot;rg4&quot; xlink:href=&quot;#rg1&quot; r=&quot;0.5&quot; fx=&quot;0.6&quot;/&gt;
+&lt;rect fill=&quot;url(#rg4)&quot;/&gt;
+</code></pre>
+<p>which is identical to:</p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg4&quot; cx=&quot;0.5&quot; cy=&quot;0.55&quot; fx=&quot;0.6&quot; fy=&quot;0.65&quot; r=&quot;0.5&quot; spreadMethod=&quot;reflect&quot;/&gt;
+&lt;rect fill=&quot;url(#rg4)&quot;/&gt;
+</code></pre>
+<h2 id="radial-gradient-attributes-resolving"><a class="header" href="#radial-gradient-attributes-resolving">Radial gradient attributes resolving</a></h2>
+<p>Radial gradients increase the complexity even more by requiring a specific order in which attributes
+must be resolved.
+Specifically, <code>fx</code> and <code>fy</code> attributes, when not set, are equal to <code>cx</code> and <code>cy</code>.
+But only when a referenced gradient doesn't set <code>fx</code> and <code>fy</code> either.
+So in the case of:</p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg1&quot; cy=&quot;0.7&quot; fx=&quot;0.8&quot;/&gt;
+&lt;radialGradient id=&quot;rg2&quot; xlink:href=&quot;#rg1&quot; cx=&quot;0.4&quot; r=&quot;0.1&quot;/&gt;
+</code></pre>
+<p><code>fx</code> will be resolved to <code>0.8</code> and not <code>0.4</code>, because it's present in a referenced element.<br>
+And <code>fy</code> will be resolved to <code>0.7</code> and not <code>0.5</code>, which is the default <code>cx</code>/<code>cy</code> value.</p>
+<p>Basically, <code>rg2</code> first becomes:</p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg2&quot; cx=&quot;0.4&quot; cy=&quot;0.7&quot; fx=&quot;0.8&quot; r=&quot;0.1&quot;/&gt;
+</code></pre>
+<p>And only then we resolve missing <code>fx</code>/<code>fy</code> attributes and end up with:</p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg2&quot; cx=&quot;0.4&quot; cy=&quot;0.7&quot; fx=&quot;0.8&quot; fy=&quot;0.7&quot; r=&quot;0.1&quot;/&gt;
+</code></pre>
+<br>
+<p>Note that stops and attributes resolving are independent.</p>
+<h2 id="patterns-and-filters"><a class="header" href="#patterns-and-filters">Patterns and filters</a></h2>
+<p>Patterns have a similar logic for resolving its attributes and children.
+And filter has a similar logic for resolving its attributes, but not children.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="recursive-references"><a class="header" href="#recursive-references">Recursive references</a></h1>
+<p>SVG provides two types of references: IRI and FuncIRI.<br>
+IRI is defined via <code>xlink:href=&quot;#id&quot;</code> and used by <code>use</code> elements,
+gradients, patterns and filters.<br>
+FuncIRI is defined via <code>url(#id)</code> and used by <code>fill</code>, <code>stroke</code>, <code>clip-path</code>, <code>mask</code>, <code>filter</code>
+and many more attributes.</p>
+<p>The main downside of any kind of references/linking system is recursive references.
+And while most SVG quirks would at worse lead to an incorrect rendering,
+this one can easily crash your application. And often does.</p>
+<p>And the wast complexity of SVG only makes it worse.
+Not only there are many ways a recursive reference can be triggered,
+but some cases are also hard to detect.
+Below are some examples.</p>
+<br>
+<p>Self-recursive:</p>
+<pre><code class="language-xml">&lt;use id=&quot;use1&quot; xlink:href=&quot;#use1&quot;/&gt;
+</code></pre>
+<br>
+<p>Simple recursive:</p>
+<pre><code class="language-xml">&lt;use id=&quot;use1&quot; xlink:href=&quot;#use2&quot;/&gt;
+&lt;use id=&quot;use2&quot; xlink:href=&quot;#use1&quot;/&gt;
+</code></pre>
+<br>
+<p>Indirect recursive:</p>
+<pre><code class="language-xml">&lt;g id=&quot;g1&quot;&gt;
+    &lt;use xlink:href=&quot;#use2&quot;/&gt;
+&lt;/g&gt;
+&lt;use id=&quot;use2&quot; xlink:href=&quot;#g1&quot;/&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;!-- this one affects masks and patterns as well --&gt;
+&lt;clipPath id=&quot;clip1&quot;&gt;
+    &lt;rect clip-path=&quot;url(#clip2)&quot;/&gt;
+&lt;/clipPath&gt;
+&lt;clipPath id=&quot;clip2&quot;&gt;
+    &lt;rect clip-path=&quot;url(#clip1)&quot;/&gt;
+&lt;/clipPath&gt;
+</code></pre>
+<br>
+<p>Remember that XML entities can also be recursive
+(see <a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">billion laughs attack</a>).
+But it's technically an XML parser problem and not SVG one.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="renderable-empty-groups"><a class="header" href="#renderable-empty-groups">Renderable empty groups</a></h1>
+<p>An SVG group is a container element. It can be used to reference multiple elements at once
+via the <code>use</code> element, as long as the group has the <code>id</code> attribute.
+It can be used to propagate common properties to its children.
+Or it can be used to visually group a list of elements.</p>
+<p>A typical group would look something like this:</p>
+<pre><code class="language-xml">&lt;g fill=&quot;green&quot;&gt;
+    &lt;rect/&gt;
+    &lt;rect/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>Here we have two rectangles that would be filled with a green color.</p>
+<p>After reading this explanation you might think that a group
+without any children is useless. After all, if there are
+no children - there is nothing to render. So such a group can <em>simply</em> be skipped.<br>
+Well, there is no such thing as <em>simple</em> in SVG.</p>
+<p>First, we have to remember that SVG supports filters. For example, a drop shadow.
+And filters can be applied to groups as well.<br>
+By default, a filter's rendering region is 10% bigger than the element's bounding box it is applied to.
+And in the case of an empty group, the bounding box is also &quot;empty&quot;, so there is nothing
+we can apply the filter to.<br>
+But a filter can define its own region in absolute coordinates, in which case
+the element's bounding box should be ignored. Yes, even when it's actually zero.</p>
+<p>What it all means is that we can easily write something like:</p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot; filterUnits=&quot;userSpaceOnUse&quot; x=&quot;20&quot; y=&quot;20&quot; width=&quot;160&quot; height=&quot;160&quot;&gt;
+    &lt;feFlood flood-color=&quot;green&quot;/&gt;
+&lt;/filter&gt;
+&lt;g filter=&quot;url(#filter1)&quot;/&gt;
+</code></pre>
+<p>and it would be rendered as:</p>
+<p align="center">
+<img src="images/empty-group-with-filter.png" width="200" height="200">
+</p>
+<h2 id="a-group-color"><a class="header" href="#a-group-color">A group color</a></h2>
+<p>And we're not done yet. Let's say we have a group like this:</p>
+<pre><code class="language-xml">&lt;g fill=&quot;green&quot;&gt;
+    &lt;rect fill=&quot;blue&quot;/&gt;
+&lt;/g&gt;
+</code></pre>
+<p>The <code>fill</code> property on the group seems to be useless.
+After all, the child rectangle would overwrite it anyway. Right?<br>
+Well, there is actually a case when this <code>fill</code> property is relevant.
+And it has to do with filters again.</p>
+<p>By default, a filter uses the current element's content as a source image.
+But it can be overwritten using not one, not two,
+but <a href="https://www.w3.org/TR/SVG11/filters.html#FilterPrimitiveInAttribute">seven inputs</a>.
+And two of them are <code>FillPaint</code> and <code>StrokePaint</code>.</p>
+<p>So in the case of:</p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot; filterUnits=&quot;userSpaceOnUse&quot; x=&quot;20&quot; y=&quot;20&quot; width=&quot;160&quot; height=&quot;160&quot;&gt;
+    &lt;!-- zero-blur acts as fill background here --&gt;
+    &lt;feGaussianBlur stdDeviation=&quot;0&quot; in=&quot;FillPaint&quot;/&gt;
+&lt;/filter&gt;
+&lt;g filter=&quot;url(#filter1)&quot; fill=&quot;green&quot;/&gt;
+</code></pre>
+<p>Our blur's input bitmap will be filled with <code>FillPaint</code>, which is the current <code>fill</code> value
+of the element the <code>filter</code> attribute was set onto.</p>
+<p>So in this case, not only the group itself isn't useless, but also the <code>fill</code> property.</p>
+<p>And yes, you can use a gradient or a pattern input as well. The only problem is that this
+case is completely undocumented and each SVG library does whatever it wants.</p>
+<p>Just look how <a href="https://github.com/RazrFalcon/notes-on-svg-parsing/blob/master/src/images/filter-fill-input-bug.svg">this</a>
+file would be rendered. It's comically bad.</p>
+<p><img src="images/filter-fill-input-bug.png" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="zero-length-paths"><a class="header" href="#zero-length-paths">Zero-length paths</a></h1>
+<p>Let's say we have a path <code>M 50 50 L 50 50</code>. Its bounding box and length are both zero.
+Can it still be rendered? Sort of.</p>
+<p>We cannot fill it, because there is no shape to be filled.
+And we cannot stroke it, because the length is zero.
+But SVG has a special case for this.</p>
+<p>If a zero-length path has a stroke with <code>stroke-linecap</code> set to <code>round</code> or <code>square</code>,
+then we have to replace it with a circle or a rectangle with a size equal to <code>stroke-width</code>
+and a center at the path's start.</p>
+<p>This means that:</p>
+<pre><code class="language-xml">&lt;path stroke=&quot;green&quot; stroke-width=&quot;50&quot; stroke-linecap=&quot;round&quot; d=&quot;M 50 50 L 50 50&quot;/&gt;
+</code></pre>
+<p>would be rendered as a circle with a radius 25 at 50,50</p>
+<p align="center">
+<img src="images/stroke-linecap-round.png" width="100"/>
+</p>
+<p>and</p>
+<pre><code class="language-xml">&lt;path stroke=&quot;green&quot; stroke-width=&quot;50&quot; stroke-linecap=&quot;square&quot; d=&quot;M 50 50 L 50 50&quot;/&gt;
+</code></pre>
+<p>would be rendered as a 50x50 rectangle at 25,25</p>
+<p align="center">
+<img src="images/stroke-linecap-square.png" width="100"/>
+</p>
+<p>Note that <code>M 10 20</code> is a malformed path not a zero-length one, while <code>M 10 20 Z</code> is zero-length.</p>
+<p>And while some 2D graphics libraries do support this out of the box, some not.
+Which means that an SVG rendering library should check each path for zero-length
+subpaths beforehand and replace them with circles and rectangles accordingly.</p>
+<p>As of Feb 2023, QtSvg doesn't support this case at all. Inkscape supports only the <code>round</code> case.
+And <code>qlmanage</code> (previews generator) on macOS renders <code>square</code> one incorrectly (while Safari is fine).</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="filter-transform"><a class="header" href="#filter-transform">Filter transform</a></h1>
+<p>As with almost every element in SVG, filters can also be transformed.
+The problem with filters in particular is that transforming them is actually pretty hard.</p>
+<p>For one, this is not documented at all. Which is not that uncommon in SVG.<br>
+But also, filters are rendered in a specific way. Unlike most elements in SVG,
+filters require a bitmap source as an input. So we have to render our element
+onto a new bitmap (its region calculation is a yet another topic),
+apply a filter to it, and then render the bitmap back onto our canvas.
+And figuring out the right place to apply the transform can be challenging.</p>
+<p>I know it sounds ridiculous. After all, affine transformations
+are the most basic SVG feature. How can one mess it up?<br>
+Well, let the following examples speak for themselves.</p>
+<p>How about a rotated rectangle with a <code>feGaussianBlur</code></p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot;&gt;
+    &lt;feGaussianBlur stdDeviation=&quot;12 0&quot;/&gt;
+&lt;/filter&gt;
+&lt;rect x=&quot;80&quot; y=&quot;10&quot; width=&quot;80&quot; height=&quot;80&quot; fill=&quot;seagreen&quot; filter=&quot;url(#filter1)&quot;
+      transform=&quot;rotate(45 60 60)&quot;/&gt;
+</code></pre>
+<p><img src="images/filter-transform-blur.png" alt="" /></p>
+<p>or a simple <code>feFlood</code></p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot; primitiveUnits=&quot;objectBoundingBox&quot; height=&quot;0.5&quot;&gt;
+    &lt;feFlood flood-color=&quot;seagreen&quot; width=&quot;0.5&quot;/&gt;
+&lt;/filter&gt;
+&lt;rect x=&quot;20&quot; y=&quot;20&quot; width=&quot;80&quot; height=&quot;80&quot; filter=&quot;url(#filter1)&quot;
+      transform=&quot;skewX(30) rotate(-30) translate(-80 40) scale(2)&quot;/&gt;
+</code></pre>
+<p><img src="images/filter-transform-flood.png" alt="" /></p>
+<p>or an even simpler <code>feOffset</code></p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot;&gt;
+    &lt;feOffset dx=&quot;20&quot; dy=&quot;40&quot;/&gt;
+&lt;/filter&gt;
+&lt;rect x=&quot;20&quot; y=&quot;20&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;seagreen&quot;
+      filter=&quot;url(#filter1)&quot; transform=&quot;skewX(30) translate(-50)&quot;/&gt;
+</code></pre>
+<p><img src="images/filter-transform-offset.png" alt="" /></p>
+<p>and what about <code>feTile</code></p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot;&gt;
+    &lt;feFlood flood-color=&quot;seagreen&quot; x=&quot;28&quot; y=&quot;28&quot; width=&quot;10&quot; height=&quot;10&quot;/&gt;
+    &lt;feOffset dx=&quot;5&quot; dy=&quot;5&quot;/&gt;
+    &lt;feTile/&gt;
+&lt;/filter&gt;
+&lt;rect x=&quot;40&quot; y=&quot;30&quot; width=&quot;90&quot; height=&quot;75&quot;
+      filter=&quot;url(#filter1)&quot; transform=&quot;skewX(30) rotate(30)&quot;/&gt;
+</code></pre>
+<p><img src="images/filter-transform-tile.png" alt="" /></p>
+<p>And the final piece! The absolute state of SVG - <code>feDiffuseLighting</code> + <code>feSpotLight</code></p>
+<pre><code class="language-xml">&lt;radialGradient id=&quot;rg1&quot; r=&quot;0.5&quot;&gt;
+    &lt;stop offset=&quot;0.5&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;black&quot; stop-opacity=&quot;0&quot;/&gt;
+&lt;/radialGradient&gt;
+&lt;filter id=&quot;filter1&quot; color-interpolation-filters=&quot;sRGB&quot;&gt;
+    &lt;feDiffuseLighting&gt;
+        &lt;feSpotLight x=&quot;140&quot; y=&quot;150&quot; z=&quot;40&quot; limitingConeAngle=&quot;20&quot;/&gt;
+    &lt;/feDiffuseLighting&gt;
+&lt;/filter&gt;
+&lt;rect x=&quot;30&quot; y=&quot;20&quot; width=&quot;100&quot; height=&quot;100&quot;
+      fill=&quot;url(#rg1)&quot; filter=&quot;url(#filter1)&quot; transform=&quot;skewX(30) rotate(30)&quot;/&gt;
+</code></pre>
+<p><img src="images/filter-transform-spotlight.png" alt="" /></p>
+<p>Every single application renders it differently! It's absurd!</p>
+<br>
+<p>All the results above were done on the latest versions of the mentioned libraries and applications
+on Feb 2023.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="automatic-document-size"><a class="header" href="#automatic-document-size">Automatic document size</a></h1>
+<p>A document size is optional in SVG. Meaning you can skip <code>width</code>, <code>height</code>
+and <code>viewBox</code> attributes on the root <code>svg</code> element.</p>
+<pre><code class="language-xml">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+    &lt;rect width=&quot;100&quot; height=&quot;100&quot; fill=&quot;green&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>The SVG above is perfectly valid. Its size would be resolved to 100x100.</p>
+<p>And while the SVG spec does <a href="https://www.w3.org/TR/SVG2/coords.html#BoundingBoxes">define</a>
+the bounding box calculation algorithm, it seems like no one follows it.
+Every implementation I've tried uses just the <em>object bounding box</em>,
+which is not what a user would expect.</p>
+<p>First, what about stroking? If our rectangle above had a very thick stroke, should it
+be included in the bounding box? According to the spec - yes. In reality - no one does.</p>
+<p>What about the filter region? Also not. Your drop shadow would be cut.</p>
+<p>What about an image that is actually an SVG as well?
+Does it mean we have to parse it as well?
+What if that SVG doesn't have size either?</p>
+<p>What if our image is just an URL and we have to download it first?</p>
+<p>And what about text? Not only its bounding box is not what you might expect
+(see the <a href="./text/bbox.html">Text bounding box</a> chapter).
+But to get it in the first place we have to perform
+the SVG Text layout algorithm. Which includes system fonts loading,
+shaping and text layout (like text-on-path).<br>
+Not something you would want to do during parsing.
+Meaning that one would have to perform text layout before resolving
+the document size, which is far from ideal.</p>
+<br>
+<p>In the end, we have a rarely used, barely documented feature that even when implemented
+&quot;correctly&quot; would produce unexpected results.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="stroke-paint-fallback"><a class="header" href="#stroke-paint-fallback">Stroke paint fallback</a></h1>
+<p>Let's say we want to stroke a shape with a gradient or a pattern.
+To do so we should use a familiar construct like <code>stroke=&quot;url(#gradient)&quot;</code>.
+Pretty easy!</p>
+<p>But remember that our gradient or pattern can have <code>objectBoundingBox</code> units.
+In which case their size is relative to the shape's bounding box. <br>
+And what if our shape has zero width or height? This is not an error.
+After all, a horizontal line has no height and a vertical line has no width.
+But out gradient's or pattern's bounding box will be zero then. Not good.</p>
+<p>The SVG spec thought about that by making everything more complicated than it should be.
+An obvious solution would be to simply skip such shapes.
+Which is indeed the default behavior. <br>
+Instead, SVG provides an additional syntax <code>stroke=&quot;&lt;FuncIRI&gt; &lt;color&gt;&quot;</code> just for this case.
+Meaning we can write <code>stroke=&quot;url(#gradient) green&quot;</code> and when a shape has zero
+width or height, it will be stroked using the green color and not simply ignored.</p>
+<p>When it can be useful? No idea.<br>
+And as expected, this trips some libraries. Mainly Inkscape and QtSvg.</p>
+<br>
+<p>Note that this feature affects only stroking, since zero width/height fill will always
+produce nothing.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="presentation-attributes-in-svg-2"><a class="header" href="#presentation-attributes-in-svg-2">Presentation attributes in SVG 2</a></h1>
+<p>SVG has a concept of <a href="https://www.w3.org/TR/SVG11/attindex.html#PresentationAttributes">presentation attributes</a>.
+Essentially, those are style properties, like <code>fill</code>, that can be set via
+CSS, a <code>style</code> attribute and as a regular XML attribute.
+Meaning that all of the following examples are functionally identical:</p>
+<pre><code class="language-xml">&lt;style&gt;
+    #rect1 { fill:green }
+&lt;/style&gt;
+&lt;rect id=&quot;rect1&quot;/&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;rect style=&quot;fill:green&quot;/&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;rect fill=&quot;green&quot;/&gt;
+</code></pre>
+<p>SVG 2 changed this behavior and all new presentation attributes are no longer allowed to be used
+as regular XML attributes. So you can write <code>style=&quot;mix-blend-mode:screen&quot;</code>,
+but not <code>mix-blend-mode=&quot;screen&quot;</code>.</p>
+<p>I have no idea why it was done, but it's a really annoying change.
+All SVG 2 presentation attributes had to be skipped during XML attributes parsing now.
+And an SVG writing library is essentially forced to use <code>style</code> everywhere,
+which makes a resulting SVG harder to read and parse.</p>
+<div style="break-before: page; page-break-before: always;"></div><p>SVG Text is probably the single most complex part of the SVG.</p>
+<p>SVG Text supports all languages; horizontal, vertical and text-on-path layouts;
+right-to-left layout; filling, stroking, masking and filtering;
+characters rotation; manual character positioning; automatic font matching; font fallback;
+text alignment; text decorations and many many more.<br>
+An SVG library simply <em>must</em> implement its own text layout.</p>
+<p>Some people might be surprised by this. After all, any decent 2D rendering library already includes
+text rendering API. What else would you need?<br>
+And the problem is that most libraries can only draw a horizontal layout,
+hide some internal metadata or do not allow any kind of post-processing.
+Which is not nearly enough for proper SVG Text support.</p>
+<p>I genuinely do believe that it's simply impossible to implement SVG Text.
+After all - no one did.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="a-character"><a class="header" href="#a-character">A character</a></h1>
+<p>This should be an easy one, right? A string of text consists of characters. Everyone knows that!</p>
+<p>I think that from a user perspective, a <em>character</em> is something you can <em>iterate</em> on.
+Press left on a keyboard and a cursor moves by <em>one character</em>. Sounds easy. Let's begin!</p>
+<!-- an ugly way to have dashes instead of dots -->
+<p>– Does A a character?<br>
+– Sure!<br>
+– Does Á a charter?<br>
+– Sure is!<br>
+– Does ﬁ a character?<br>
+– Nope! It's two characters.<br>
+– Wrong! It's a <a href="https://en.wikipedia.org/wiki/Ligature_(writing)">ligature</a>
+and therefore a single character (can depend on a font).<br>
+– Does =&gt; a character?<br>
+– No?<br>
+– It can be! Depending on <a href="https://github.com/tonsky/FiraCode">a font</a>.<br>
+– Does 😃 a character?<br>
+– Sure.<br>
+– Does क्षि a character?<br>
+– Hm...<br>
+– It is!<br>
+– Does द्ध्र्य a character?<br>
+– Again?!<br>
+– Yes! And it is.<br>
+– Does ȧ̶̻̫̍̽̔ a character?<br>
+– Wut?!<br>
+– It is! And it's called <a href="https://en.wikipedia.org/wiki/Zalgo_text">Zalgo</a>.<br></p>
+<p>A modern text layout is a ridiculously complicated topic. It includes Unicode, TrueType fonts,
+shaping and many more. But all we care for now is just the definition of a <em>character</em>.</p>
+<p>In modern typography, all <em>characters</em> above are called
+<a href="https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries">grapheme clusters</a>.
+This is what <em>a character</em> is from a computer perspective. And what SVG uses as well.</p>
+<p>A grapheme cluster is not a Unicode code point (like UTF-32), but rather a collection of code points.
+And to get grapheme clusters from a string we would have to pass it, along with a font, to
+<a href="https://harfbuzz.github.io/what-is-harfbuzz.html">a shaper</a>.</p>
+<br>
+<p>Ok, so an SVG character is a grapheme cluster. Needs some time to wrap your head around
+and study modern typography, but looks simple enough. Wrong!</p>
+<p>First, SVG 1.1 doesn't actually define what a character is. Seriously.
+If you open <a href="https://www.w3.org/TR/SVG11/text.html">the spec</a> there are no mentions of it.<br>
+Luckily, SVG 2 fixed this and provided us with a
+<a href="https://www.w3.org/TR/SVG2/text.html#Definitions">definition</a>
+of... two kinds of characters?! What?!<br>
+Welcome to the world of SVG!</p>
+<p>In SVG 2 we have an <em>addressable character</em> aka UTF-16 code point and a <em>typographic character</em>
+aka an <em>extended grapheme cluster</em> (but not really).<br>
+To quote <a href="https://drafts.csswg.org/css-text-3/#typographic-character-unit">the spec</a>:</p>
+<blockquote>
+<p>Text Segmentation defines a unit called the grapheme cluster which
+approximates the typographic character. A UA must use the extended grapheme cluster (not legacy
+grapheme cluster), as defined in UAX29, as the basis for its typographic character unit.
+However, the UA should tailor the definitions as required by typographic tradition since
+the default rules are not always appropriate or ideal — and is expected to tailor
+them differently depending on the operation as needed.</p>
+</blockquote>
+<p>If someone knows what this mean in a human language - please let me know.</p>
+<p>In short, all the above simply means that <code>x</code>, <code>y</code>, <code>dx</code>, <code>dy</code> and <code>rotate</code> attributes operate
+on <em>addressable characters</em> and everything else works with <em>typographic characters</em>.</p>
+<p>Weirdly enough, characters placement along the path (in the case of <code>textPath</code>)
+is done using <em>typographic</em> and not <em>addressable characters</em>.
+While technically this is still a positioning phase.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="text-chunks"><a class="header" href="#text-chunks">Text chunks</a></h1>
+<p>When developing <a href="https://github.com/RazrFalcon/resvg">resvg</a>,
+text chunks were probably one of the hardest things about text to wrap my head around.</p>
+<p>When someone thinks about SVG text they probably imagine something like this:</p>
+<pre><code class="language-xml">&lt;text x=&quot;5&quot; y=&quot;10&quot; font-family=&quot;Arial&quot;&gt;
+    &lt;span fill=&quot;red&quot;&gt;red&lt;/span&gt; text
+&lt;/text&gt;
+</code></pre>
+<p>Basically, a text with some styles applied to it. And this is true in most cases, but it's not how
+SVG text structure actually looks like. SVG has an additional, hidden structure level called
+<em>text chunk</em>.
+Every time there is an <code>x</code> or <code>y</code> attribute in <code>&lt;text&gt;</code> or <code>&lt;tspan&gt;</code> - a new text chunk is defined.
+This means that an SVG text element actually contains a list of text chunks,
+where each chunk contains text with styles applied to it.</p>
+<p>In some sort of pseudo-code it should look like:</p>
+<pre><code class="language-python">class Text:
+    chunks: list[TextChunk] = []
+
+class TextChunk:
+    text: str = &quot;&quot;
+    spans: list[TextSpan] = []
+    alignment: int = 0 # start/mid/end
+
+class TextSpan:
+    # fill, stroke, font, etc.
+</code></pre>
+<p>For example, this text element has two chunks: <em>some</em> at 5,10 and <em>text</em> at 5,20.</p>
+<pre><code class="language-xml">&lt;text x=&quot;5&quot; y=&quot;10&quot; font-family=&quot;Arial&quot;&gt;
+    some
+    &lt;tspan y=&quot;20&quot;&gt;text&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<br>
+<p>Why is this important? Because this is what a <em>line of text</em> in SVG means - a chunk.<br/>
+This is a <em>line of text</em> that would be passed to a text shaper/layout,
+and not the whole element's content.<br/>
+This is a <em>line of text</em> that would be aligned via <code>text-anchor</code>,
+and not the whole element's content or individual <code>&lt;tspan&gt;</code>.<br/>
+It's a very subtle nuance, but many libraries fail to handle it correctly.</p>
+<p>For example, in this case, <code>text-anchor</code> has no effect because that <code>&lt;tspan&gt;</code>
+doesn't define a new chunk by setting an absolute coordinate.</p>
+<pre><code class="language-xml">&lt;text x=&quot;5&quot; y=&quot;10&quot; font-family=&quot;Arial&quot;&gt;
+    some
+    &lt;tspan text-anchor=&quot;end&quot;&gt;text&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>In theory, each text chunk can be extracted into its own <code>text</code> element, while <code>tspan</code> can't.</p>
+<br>
+<p>Also, while it's not clear from the spec, each <code>textPath</code> defines a new chunk as well.</p>
+<p>Another interesting edge case is that there could be only one <code>writing-mode</code> per text element.
+An individual chunk or span cannot have their own writing modes.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="whitespaces-handling"><a class="header" href="#whitespaces-handling">Whitespaces handling</a></h1>
+<p>Where do I even begin with this one... I think overall, I have spent around a month
+just to figure out how to properly extract text with whitespaces from an SVG.
+Not only the way SVG treats whitespaces is utterly unintuitive, but after you add <code>xml:space</code>
+to the mix, it becomes a truly horrifying thing.
+To this day, most SVG libraries do not handle <code>xml:space</code> properly.
+And to make things worse, SVG 2 added the <code>white-space</code> property, which is incompatible with <code>xml:space</code>.</p>
+<p>Note that while the root of the problem starts with XML, it only partially responsible for this mess.</p>
+<p>Whitespaces handling is roughly split into two steps: XML side and SVG side.
+The only thing a proper XML library should do is to replace new lines with spaces.
+It must not trim them and/or post-process them in any other way.
+All of this should be done by an SVG library.</p>
+<p>Let's say we have a text like this:</p>
+<pre><code class="language-xml">&lt;text&gt; A   lot     of
+spaces&lt;/text&gt;
+</code></pre>
+<p>it should be parsed as <code>A lot of spaces</code>. No leading, trailing and duplicated whitepaces.
+Easy so far.</p>
+<p>If we add <code>xml:space</code> to the mix:</p>
+<pre><code class="language-xml">&lt;text xml:space=&quot;preserve&quot;&gt; A   lot     of
+spaces&lt;/text&gt;
+</code></pre>
+<p>then it would be parsed as <code>␣A␣␣␣lot␣␣␣␣␣of␣spaces</code>. New lines were replaced with spaces,
+but that's about it.</p>
+<p>How about we add some style to it:</p>
+<pre><code class="language-xml">&lt;text&gt;
+    &lt;tspan&gt;
+        Some
+    &lt;/tspan&gt;
+    &lt;tspan&gt;
+        text
+    &lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>This one should be parsed as <code>Some text</code>. Why? Because if we trim white spaces we would end up with:</p>
+<pre><code class="language-xml">&lt;text&gt;&lt;tspan&gt;Some&lt;/tspan&gt; &lt;tspan&gt;text&lt;/tspan&gt;&lt;/text&gt;
+</code></pre>
+<p>Yes, the space between non-empty <code>tspan</code>s should be preserved.
+Inkscape 1.2 fails to handle this correctly.</p>
+<p>Those two should be handled the same way:</p>
+<pre><code class="language-xml">&lt;text&gt;
+    &lt;tspan&gt;
+        Text
+    &lt;/tspan&gt;
+    Text
+&lt;/text&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;text&gt;
+    &lt;tspan&gt;
+        Text
+        &lt;tspan&gt;
+            Text
+        &lt;/tspan&gt;
+    &lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>And this time Inkscape manages to parse them correctly.</p>
+<br>
+<p>Let's look into something more interesting, like:</p>
+<pre><code class="language-xml">&lt;text&gt;
+    Text  &lt;tspan xml:space=&quot;preserve&quot;&gt;  Text  &lt;/tspan&gt;  Text
+&lt;/text&gt;
+</code></pre>
+<p>Which should be parsed as <code>Text␣␣␣Text␣␣Text</code>. Yes, 3 and 2 spaces respectively.
+Why? I don't know. Apparently this obvious case isn't well defined in the SVG/XML spec.
+Chrome, Batik and resvg will produce 3 and 2 spaces, while Firefox, Safari, Inkscape, librsvg and QtSvg
+will produce 3 and 3 spaces.</p>
+<p>Note that <code>resvg</code> simply follows our overlord Chrome here,
+because this is the output most people would expect.
+This is not about being right or wrong, but about the market share.</p>
+<br>
+<p>Similarly, an inverted version of the text above:</p>
+<pre><code class="language-xml">&lt;text xml:space=&quot;preserve&quot;&gt;  Text  &lt;tspan xml:space=&quot;default&quot;&gt;  Text  &lt;/tspan&gt;  Text  &lt;/text&gt;
+</code></pre>
+<p>should be parsed as <code>␣␣Text␣␣Text␣␣␣Text␣␣</code>.</p>
+<br>
+<p>But we're not done yet! Let's try making it even worse:</p>
+<pre><code class="language-xml">&lt;text xml:space=&quot;preserve&quot;&gt;
+    &lt;tspan xml:space=&quot;default&quot;&gt;
+        Some
+        &lt;tspan xml:space=&quot;preserve&quot;&gt;
+            text
+        &lt;/tspan&gt;
+    &lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>Everyone except Firefox agrees that it should be parsed as
+<code>␣␣␣␣␣Some␣␣␣␣␣␣␣␣␣␣␣␣␣␣text␣␣␣␣␣␣␣␣␣␣</code>.
+So 5, 14 and 10. Or:</p>
+<pre><code class="language-xml">&lt;text xml:space=&quot;preserve&quot;&gt;     &lt;tspan xml:space=&quot;default&quot;&gt;Some &lt;tspan xml:space=&quot;preserve&quot;&gt;             text         &lt;/tspan&gt;&lt;/tspan&gt; &lt;/text&gt;
+</code></pre>
+<p>Firefox will ignore the first 5 whitespaces for some reason. Probably a bug.</p>
+<br>
+<p>Just think about it for a second. We haven't talked about fonts, styles, decorations, or alignment.
+No. This is just whitespaces. The first text parsing step. And we already cannot have reproducible results.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="bounding-box"><a class="header" href="#bounding-box">Bounding box</a></h1>
+<p>SVG has a concept of coordinates that are relative to object's bounding box.
+This is used by gradients, patterns, clip paths, masks and filters.
+And it can be useful when we don't know the exact bounding box beforehand.
+For example, a text with a random font.<br>
+Filters even have a default region that is 10% bigger (in all directions)
+than the object's bounding box. Which is handy for something like a blur filter.</p>
+<p>For paths and images, a bounding box is pretty straightforward
+(note that the path's bounding box doesn't include stroke and markers). But what about text?</p>
+<p>Let's say we have something as simple as:</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;60&quot; font-family=&quot;Noto Sans&quot; font-size=&quot;48&quot; text-anchor=&quot;middle&quot;&gt;Text&lt;/text&gt;
+</code></pre>
+<p align="center">
+<img src="text/../images/text-bbox-base.png" width="200"/>
+</p>
+<p>What do you think is the bounding box of this text?
+Something like this (highlighted with a green rectangle)?</p>
+<p align="center">
+<img src="text/../images/text-bbox-wrong.png" width="200"/>
+</p>
+<p>Nope! This is a <em>path</em> bounding box, not <em>text</em> bounding box.</p>
+<p>To visualize the actual object's bounding box we can use a filter with relative coordinates,
+like so:</p>
+<pre><code class="language-xml">&lt;filter id=&quot;filter1&quot; x=&quot;0%&quot; y=&quot;0%&quot; width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+    &lt;feFlood flood-color=&quot;aquamarine&quot;/&gt;
+&lt;/filter&gt;
+</code></pre>
+<p>This filter will fill a region that equals the object's bounding box with an aquamarine color.
+And after applying it to our text we would get:</p>
+<p align="center">
+<img src="text/../images/text-bbox-actual.png" width="200"/>
+</p>
+<p>If you're familiar with a modern text layout you're probably not that surprised.
+But if you're not, here is a cool illustration from Apple's docs:</p>
+<!-- src: https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/Art/glyph_metrics_2x.png -->
+<p align="center">
+<img src="text/../images/glyph-metrics.png" height="300"/>
+</p>
+<p>What we're interested in here is <em>line height</em> (the first vertical measure on the left).
+Text layout width + <em>line height</em> is our <em>text</em> bounding box.
+This is what should be used when <code>objectBoundingBox</code> property is defined.</p>
+<p>And while Chrome, Firefox and Safari are all fine,
+Batik, Inkscape and librsvg will produce an incorrect output.</p>
+<h2 id="leading-and-trailing-spaces"><a class="header" href="#leading-and-trailing-spaces">Leading and trailing spaces</a></h2>
+<p>By default, all leading and trailing spaces would be removed from a text element in SVG.
+Unless we set <code>xml:space</code> to <code>preserve</code>.
+And the spaces we have preserved do affect the bounding box as well.</p>
+<p>For an SVG like:</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;60&quot; text-anchor=&quot;middle&quot; xml:space=&quot;preserve&quot;&gt;  Text  &lt;/text&gt;
+</code></pre>
+<p>We would get:</p>
+<p align="center">
+<img src="text/../images/text-bbox-space-preserve.png" width="200"/>
+</p>
+<p>Chrome, Firefox, Safari and Inkscape handle this correctly, but Batik and librsvg don't.
+What's even stranger is that Inkscape accounts for leading/trailing spaces,
+but not not line height, which we discussed above.</p>
+<h2 id="zalgo"><a class="header" href="#zalgo">Zalgo</a></h2>
+<p>Previously, I've said that font's <em>line height</em> is our bounding box height.
+Well, this is only true for simple cases.</p>
+<p>In a modern text layout a line doesn't technically have a height. Or rather a height limit.
+This may sound a bit surprising, but it's true. And a good illustration of this
+is <a href="https://en.wikipedia.org/wiki/Zalgo_text">Zalgo text</a>.</p>
+<p>Let's try rendering Te̶̗̯̪̺̋̓̍̾́xt using various SVG libraries:</p>
+<p><img src="text/../images/text-bbox-zalgo.png" alt="" /></p>
+<p>Ugh... Welcome to the hell the SVG Text is.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="language"><a class="header" href="#language">Language</a></h1>
+<p>When a text has characters not present in a specified font family(ies),
+an SVG library would try to fallback to a <em>random</em> font that contains those characters.
+This process is called <em>font fallback</em>. It's completely undefined
+and it's a rabbit hole on its own.</p>
+<p>The problem is that a single Unicode character can have different meanings depending on the language.
+It's not an issue for most languages but can become one
+for Chinese derivatives (aka <a href="https://en.wikipedia.org/wiki/CJK_characters">CJK</a>).</p>
+<p>To force the text language, SVG uses the <code>xml:lang</code> attribute:</p>
+<pre><code class="language-xml">&lt;g font-family=&quot;sans-serif&quot; font-size=&quot;32&quot;&gt;
+    &lt;!-- Default (will usually fallback to Chinese) --&gt;
+    &lt;text x=&quot;100&quot; y=&quot;58&quot; text-anchor=&quot;middle&quot;&gt;刃直海角骨入&lt;/text&gt;
+    &lt;!-- Japanese --&gt;
+    &lt;text x=&quot;100&quot; y=&quot;108&quot; text-anchor=&quot;middle&quot; xml:lang=&quot;ja&quot;&gt;刃直海角骨入&lt;/text&gt;
+    &lt;!-- Traditional Chinese --&gt;
+    &lt;text x=&quot;100&quot; y=&quot;158&quot; text-anchor=&quot;middle&quot; xml:lang=&quot;zh-HANT&quot;&gt;刃直海角骨入&lt;/text&gt;
+&lt;/g&gt;
+</code></pre>
+<p>Here we define <code>font-family</code> to be essentially anything and we have three
+text elements with exactly the same content, but different languages.</p>
+<p>Based on my tests, only Chrome, Firefox and librsvg do handle <code>xml:lang</code>
+and the expected output should look something like this:</p>
+<p align="center">
+<img src="text/../images/text-language.png" width="200"/>
+</p>
+<p>As you can see, while our Unicode strings are identical, they are rendered differently.<br>
+On macOS, Chrome would fallback to the following fonts:</p>
+<ul>
+<li>PingFang SC for the &quot;default&quot; language</li>
+<li>Hiragino Kaku Gothic ProN for Japanese</li>
+<li>PingFang TC for Traditional Chinese</li>
+</ul>
+<p>And while the actual &quot;style&quot; of a glyph can be different depending on a font,
+the hieroglyph itself should always be the same.</p>
+<br>
+<p>Note: This chapter was inspired by
+<a href="https://heistak.github.io/your-code-displays-japanese-wrong/">this article</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="letter-spacing"><a class="header" href="#letter-spacing"><code>letter-spacing</code></a></h1>
+<p>SVG supports the <a href="https://www.w3.org/TR/css-text-3/#letter-spacing-property">letter-spacing</a>
+property from CSS. On the surface, it's a pretty simple feature.
+Just add spacing between letters. How hard can it be?!
+Well, everything that involves text is hard.</p>
+<p>The first issue with <code>letter-spacing</code> is that not all scripts (language categories)
+support spacing. The best example is Arabic, aka a cursive script.
+CSS even has <a href="https://www.w3.org/TR/css-text-3/#cursive-tracking">a good illustration</a> of it.
+But the problem is that it seems like no one cares. At least for SVG.<br>
+Instead of نص we're getting:</p>
+<p><img src="text/../images/letter-spacing-arabic.png" alt="" /></p>
+<p>Safari, somehow, even disabled shaping completely.</p>
+<p>Another issue is that the CSS spec explicitly states that spacing should be
+applied only <em>between</em> letters. So there should be no leading/trailing spaces.
+But this one is ignored by browsers as well.<br>
+This is how the following SVG would be rendered:</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; text-anchor=&quot;middle&quot; letter-spacing=&quot;100&quot; font-size=&quot;48&quot;&gt;A&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/letter-spacing-tail.png" alt="" /></p>
+<p>As you can see, Chrome, Firefox and Batik are clearly adding a trailing space.
+That's why center alignment is broken.</p>
+<p>Negative spacing is basically an undefined behavior as well. And while a small negative value
+should put letters close to each other, a larger one produces random results.</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;100&quot; letter-spacing=&quot;-1000&quot; text-anchor=&quot;middle&quot;&gt;Text&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/letter-spacing-negative.png" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="text-decoration"><a class="header" href="#text-decoration"><code>text-decoration</code></a></h1>
+<p>What if I tell you that <code>text-decoration</code> is one of the least supported SVG features?
+Yes, the one that is used to underline a text.
+How is it even possible?! Let's find out!</p>
+<p>The first unintuitive thing you have to understand about <code>text-decoration</code>
+is that it's inheritable and uses properties from the element it was defined on.<br>
+So in the case of:</p>
+<pre><code class="language-xml">&lt;text&gt;
+    &lt;tspan fill=&quot;green&quot; text-decoration=&quot;underline&quot;&gt;
+        &lt;tspan fill=&quot;black&quot;&gt;Text&lt;/tspan&gt;
+    &lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>our underline would be green and not black.</p>
+<p><img src="text/../images/text-decoration-inheritence.png" alt="" /></p>
+<p>Hm... Ok, let's ignore different width, height, position and everything else for now.</p>
+<br>
+<p>The second unintuitive thing is that decoration properties include font properties as well.
+So if we have:</p>
+<pre><code class="language-xml">&lt;text&gt;
+    &lt;tspan fill=&quot;green&quot; font-family=&quot;Arial&quot; font-size=&quot;200&quot; text-decoration=&quot;underline&quot;&gt;
+        &lt;tspan fill=&quot;black&quot; font-family=&quot;Noto Sans&quot; font-size=&quot;48&quot;&gt;Text&lt;/tspan&gt;
+    &lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>then our underline would use Arial font metrics and not Noto Sans one.
+And yes, underline thickness and position are stored in the font.</p>
+<p>In reality though...</p>
+<p><img src="text/../images/text-decoration-font.png" alt="" /></p>
+<p>Firefox and Safari are the only one &quot;correct&quot; here.</p>
+<br>
+<p>The third unintuitive thing is that decorations are cumulative.
+Meaning we can define multiple <code>text-decoration</code>'s separately and they have to be combined.
+And yes, preserved their individual styles.</p>
+<pre><code class="language-xml">&lt;text x=&quot;50&quot; y=&quot;60&quot; font-family=&quot;Noto Sans&quot; font-size=&quot;48&quot;&gt;
+    &lt;tspan fill=&quot;green&quot; text-decoration=&quot;underline&quot;&gt;
+        &lt;tspan fill=&quot;blue&quot; text-decoration=&quot;line-through&quot;&gt;
+            &lt;tspan fill=&quot;black&quot;&gt;Text&lt;/tspan&gt;
+        &lt;/tspan&gt;
+    &lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-decoration-inheritence-multiple.png" alt="" /></p>
+<p>Here, Firefox and Batik are correct.
+But at this point it's even hard to tell who is right or wrong.</p>
+<br>
+<p>Another problem with such fundamental properties such as <code>text-decoration</code> is that they can affect
+many other SVG constructs. Like a vertical text.</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;100&quot; font-family=&quot;Amiri&quot; font-size=&quot;20&quot; text-anchor=&quot;middle&quot;
+      writing-mode=&quot;tb&quot; text-decoration=&quot;underline&quot;&gt;本 Hi! اليابان&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-decoration-vertical.png" alt="" /></p>
+<p>Well, yeah... Safari, for a browser, is comically bad here.</p>
+<br>
+<p>Let's also remember that letters in SVG can be rotated. In which case underline
+is not longer... well, a line.</p>
+<pre><code class="language-xml">&lt;linearGradient id=&quot;lg1&quot;&gt;
+    &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot;/&gt;
+    &lt;stop offset=&quot;1&quot; stop-color=&quot;green&quot;/&gt;
+&lt;/linearGradient&gt;
+&lt;text x=&quot;10&quot; y=&quot;65&quot; rotate=&quot;15&quot; fill=&quot;url(#lg1)&quot;
+      font-family=&quot;Noto Sans&quot; font-size=&quot;86&quot; text-decoration=&quot;underline&quot;&gt;Text&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-decoration-rotate.png" alt="" /></p>
+<p>Note that <code>text-decoration</code> would be converted into paths and become a part of
+the whole text content. Basically, the <code>text</code> element would become a group
+with paths.</p>
+<p>As you can see, Safari has an incorrect gradient position on underline.
+Batik and librsvg are drawn just a line. And Inkscape simply gave up.</p>
+<br>
+<p>Finally, let's ignore all the rules and try to render the most absurd case possible.
+A vertical text, partially on a circle path, with decoration defined outside the text element.</p>
+<pre><code class="language-xml">&lt;g text-decoration=&quot;overline&quot; fill=&quot;red&quot;&gt;
+    &lt;text writing-mode=&quot;tb&quot; fill=&quot;black&quot;&gt;
+        &lt;textPath xlink:href=&quot;#path1&quot;&gt;
+            非常に長いテキ
+        &lt;/textPath&gt;
+        スト。
+    &lt;/text&gt;
+&lt;/g&gt;
+</code></pre>
+<p><img src="text/../images/text-decoration-on-path.png" alt="" /></p>
+<p>Yeah... This is SVG for you. No one knows what to do.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="text-anchor"><a class="header" href="#text-anchor"><code>text-anchor</code></a></h1>
+<p>SVG allows text alignment using the <code>text-anchor</code> property.
+It supports three pretty common states:
+start (left), middle (center) and end (right).
+As always, it might look like a simple property, but it is not.</p>
+<p>The first issue is that <code>text-anchor</code> aligns a text chunk and not the whole text
+and not a span. You can find more info about it
+in the <a href="text/./chunks.html">Text chunks</a> chapter.</p>
+<p>The second issue is that its behavior somewhat defined only for horizontal,
+left-to-right layouts.
+Right-to-left and vertical layouts are completely undefined.
+How bad can it be? Well, let's start with something simple.</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;60&quot; text-anchor=&quot;end&quot;&gt;
+    Start&lt;tspan x=&quot;100&quot; y=&quot;100&quot; text-anchor=&quot;middle&quot;&gt;middle&lt;/tspan&gt;
+    &lt;tspan x=&quot;100&quot; y=&quot;140&quot; text-anchor=&quot;start&quot;&gt;end&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-anchor-english.png" alt="" /></p>
+<p>Inkscape already out.</p>
+<br>
+<p>What about Arabic text?</p>
+<pre><code class="language-xml">&lt;text&gt;
+    &lt;tspan x=&quot;100&quot; y=&quot;60&quot; text-anchor=&quot;end&quot;&gt;مفتاح&lt;/tspan&gt;
+    &lt;tspan x=&quot;100&quot; y=&quot;100&quot; text-anchor=&quot;middle&quot;&gt;معايير&lt;/tspan&gt;
+    &lt;tspan x=&quot;100&quot; y=&quot;140&quot; text-anchor=&quot;start&quot;&gt;الويب&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-anchor-arabic-1.png" alt="" /></p>
+<p>Hm... Not good. Technically, our overlord Chrome is correct here.
+Firefox is close, but has a slightly incorrect placement.
+Safari, Batik and Inkscape are completely wrong.</p>
+<br>
+<p>Now let's make our text a bit more complex, but logically the same.</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;60&quot; text-anchor=&quot;end&quot;&gt;
+    مفتاح
+    &lt;tspan x=&quot;100&quot; y=&quot;100&quot; text-anchor=&quot;middle&quot;&gt;معايير&lt;/tspan&gt;
+    &lt;tspan x=&quot;100&quot; y=&quot;140&quot; text-anchor=&quot;start&quot;&gt;الويب&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p>Now our first chunk doesn't have a dedicated <code>tspan</code>, but logically it's identical to the one above.</p>
+<p><img src="text/../images/text-anchor-arabic-2.png" alt="" /></p>
+<p>And immediately, our seemingly trivial change lead to a different output.</p>
+<br>
+<p>Somehow, even by removing a new line from the first text node we can change the rendering.</p>
+<pre><code class="language-xml">&lt;text x=&quot;100&quot; y=&quot;60&quot; text-anchor=&quot;end&quot;&gt;
+    مفتاح&lt;tspan x=&quot;100&quot; y=&quot;100&quot; text-anchor=&quot;middle&quot;&gt;معايير&lt;/tspan&gt;
+    &lt;tspan x=&quot;100&quot; y=&quot;140&quot; text-anchor=&quot;start&quot;&gt;الويب&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-anchor-arabic-3.png" alt="" /></p>
+<p>Notice that Safari no longer renders two words one the same line now.</p>
+<p>Whitespaces handling in SVG is its own circle of hell, which we discuss in
+the <a href="text/./whitespaces.html">Whitespaces handling</a> chapter. And it can affect even
+something seemingly unrelated like RTL text alignment.</p>
+<br>
+<p>At last, what about the vertical layout? Even with an English text.</p>
+<pre><code class="language-xml">&lt;text y=&quot;100&quot; x=&quot;60&quot; writing-mode=&quot;tb&quot; font-family=&quot;Noto Sans&quot; font-size=&quot;32&quot;&gt;
+    Start&lt;tspan y=&quot;100&quot; x=&quot;100&quot; text-anchor=&quot;middle&quot;&gt;middle&lt;/tspan&gt;
+    &lt;tspan y=&quot;100&quot; x=&quot;140&quot; text-anchor=&quot;end&quot;&gt;end&lt;/tspan&gt;
+&lt;/text&gt;
+</code></pre>
+<p><img src="text/../images/text-anchor-vertical.png" alt="" /></p>
+<p>Yeah... As expected.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="fill-rule"><a class="header" href="#fill-rule">fill-rule</a></h1>
+<p>A typical SVG renderer doesn't actually render text directly to the canvas,
+like a GUI library would, but rather converts it into paths and then renders them.
+After all, a text in SVG is basically a fancy way to define paths.</p>
+<p>The edge case that arises when treating text as paths are that it must not be affected
+by the <code>fill-rule</code> property. It might not affect a typical Latin text, but in complex scripts,
+it might lead to bugs like this:</p>
+<p align="center">
+<img src="text/../images/text-fill-rule.png" width="250"/>
+</p>
+<p>A proper parser must always set text <code>fill-rule</code> to <code>nonzero</code>.</p>
+<p>And before you think that no one would make such an obvious mistake,
+the image above was produced by Inkscape 1.2 (2022).</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="the-use-element"><a class="header" href="#the-use-element">The <code>use</code> element</a></h1>
+<p>The <code>use</code> element provides a nice feature: instead of copying the same
+element multiple times, we can define it once and simply reference it when needed.
+Meaning that instead of:</p>
+<pre><code class="language-xml">&lt;g&gt;
+    &lt;!-- same elements --&gt;
+&lt;/g&gt;
+&lt;g&gt;
+    &lt;!-- same elements --&gt;
+&lt;/g&gt;
+&lt;g&gt;
+    &lt;!-- same elements --&gt;
+&lt;/g&gt;
+</code></pre>
+<p>we can write</p>
+<pre><code class="language-xml">&lt;g id=&quot;my-group&quot;&gt;
+    &lt;!-- same elements --&gt;
+&lt;/g&gt;
+&lt;use xlink:href=&quot;#my-group&quot;/&gt;
+&lt;use xlink:href=&quot;#my-group&quot;/&gt;
+</code></pre>
+<p>A cool idea that quickly becomes a nightmare.</p>
+<br>
+<p>The first issue with <code>use</code> is style resolving. Let's say we have:</p>
+<pre><code class="language-xml">&lt;g fill=&quot;red&quot;&gt;
+    &lt;rect id=&quot;my-rect&quot;/&gt;
+&lt;/g&gt;
+&lt;use xlink:href=&quot;#my-rect&quot; fill=&quot;green&quot;/&gt;
+</code></pre>
+<p>What color the rectangle would have? As you've probably guessed - it's green.<br>
+But why? Our rectangle doesn't define a <code>fill</code> attribute, therefore we have to look
+for it in parent elements. And <code>my-rect</code> parent is <code>g</code>. So it should be red, no?</p>
+<p>No. A referenced element parent is <code>use</code>. Not the actual parent in an XML document.
+An SVG library should simply replace each <code>use</code> instance
+with a group, copying all non-<code>use</code> attributes into it and
+copying the referenced element inside it (ignoring the ID to prevent duplication).
+So our example above would become:</p>
+<pre><code class="language-xml">&lt;g fill=&quot;red&quot;&gt;
+    &lt;rect id=&quot;my-rect&quot;/&gt;
+&lt;/g&gt;
+&lt;g fill=&quot;green&quot;&gt;
+    &lt;rect/&gt;
+&lt;/g&gt;
+</code></pre>
+<br>
+<p>But that's no all. CSS has to be applied to the original tree,
+not the one where <code>use</code> was already instanced.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="use-to-symbol"><a class="header" href="#use-to-symbol"><code>use</code> to <code>symbol</code></a></h1>
+<p>The <code>use</code> element has three separate <a href="https://www.w3.org/TR/SVG11/struct.html#UseElement">behaviors</a>
+depending on what element it is referencing:
+a <code>svg</code> element, a <code>symbol</code> element or any other graphical element.
+In this chapter we would focus on the <code>symbol</code> element.</p>
+<p>What is <code>symbol</code>?
+The <a href="https://www.w3.org/TR/SVG11/struct.html#SymbolElement">SVG 1 definition</a>
+of the <code>symbol</code> was hilariously bare-bone. It basically only acknowledges that such
+an element exists and that's it. This is probably the reason why it's so poorly supported.<br>
+The <a href="https://www.w3.org/TR/SVG2/struct.html#SymbolElement">SVG 2 definition</a>
+of the <code>symbol</code> is far better but still doesn't really go into nitty-gritty details.
+And more importantly, doesn't explain why we need it in the first place.</p>
+<p>In simple terms, <code>symbol</code> is just an invisible, nested <code>svg</code>.<br>
+Why does it even exist then? That's a good question and I have no idea.</p>
+<p>Unlike nested <code>svg</code>, <code>symbol</code> cannot be rendered directly, even when it is located outside <code>defs</code>.
+And it isn't just <code>display:none</code>. <code>symbol</code> and all its content are invisible by design
+and can be rendered only via <code>use</code>.
+And since <code>symbol</code> is just a nested <code>svg</code>, it also has its own viewport and must be clipped,
+which confuses a lot of people.</p>
+<p>Let's say we have an SVG like this:</p>
+<pre><code class="language-xml">&lt;svg viewBox=&quot;0 0 200 200&quot;&gt;
+    &lt;symbol id=&quot;symbol1&quot;&gt;
+        &lt;circle cx=&quot;0&quot; cy=&quot;0&quot; r=&quot;80&quot; fill=&quot;green&quot;/&gt;
+    &lt;/symbol&gt;
+    &lt;use xlink:href=&quot;#symbol1&quot; transform=&quot;translate(100 100)&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<p>A <code>symbol</code> with a green circle at 0,0 rendered with a 100,100 offset.
+You would probably imagine to see a circle in the center of the image.<br>
+Wrong!</p>
+<p align="center">
+<img src="use/../images/use-to-symbol-1.png" width="200" height="200">
+</p>
+<p>Wait, why there is only a quarter of the circle visible? Where the rest have gone?</p>
+<p>Well, this is <code>symbol</code> for you. Remember that just like a nested <code>svg</code>, symbol must be clipped.
+And by default, the clip region is the same as the current viewport, aka our root <code>svg</code> element.</p>
+<p>What a rendered would do is that it would create a new canvas with the same size as the parent one.
+So 200x200 in our case. Draw <code>symbol</code>'s content onto it, clipping everything outside the canvas.
+Draw <code>symbol</code>'s canvas onto the main canvas using the transform specified on the <code>use</code> element.</p>
+<p>Since out circle starts at 0,0 - our symbol canvas would have only
+the bottom-right quarter of the circle, which then be moved to the center of the main canvas.</p>
+<p>In fact, we can losslessly rewrite our SVG above into:</p>
+<pre><code class="language-xml">&lt;svg viewBox=&quot;0 0 200 200&quot;&gt;
+    &lt;clipPath id=&quot;clipPath1&quot;&gt;
+        &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;200&quot; height=&quot;200&quot; fill=&quot;black&quot;/&gt;
+    &lt;/clipPath&gt;
+    &lt;g clip-path=&quot;url(#clipPath1)&quot; transform=&quot;translate(100 100)&quot;&gt;
+        &lt;circle cx=&quot;0&quot; cy=&quot;0&quot; r=&quot;80&quot; fill=&quot;green&quot;/&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;
+</code></pre>
+<!-- TODO: link nested svg chapter when ready -->
+<!-- TODO: explain viewbox and size logic -->
+<br>
+<p>Also, since <code>symbol</code> is just a nested <code>svg</code>, it also affected by the
+<a href="use/./use-to-svg-size-resolving.html"><code>use</code> to <code>svg</code> size resolving</a> logic.</p>
+<br>
+<p>Overall, <code>symbol</code> is quite useless, unintuitive and poorly supported
+(Inkscape 1.2 basically ignores it). I would strongly advise against using it.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="use-to-svg-size-resolving"><a class="header" href="#use-to-svg-size-resolving"><code>use</code> to <code>svg</code> size resolving</a></h1>
+<p>The <code>use</code> element can reference almost all graphical elements, including <code>svg</code>.
+But this case has to be handled differently.</p>
+<p>If you read <a href="https://www.w3.org/TR/SVG11/struct.html#UseElement">the spec</a> very carefully,
+you will notice the following line:</p>
+<blockquote>
+<p>If attributes <code>width</code> and/or <code>height</code> are provided on the <code>use</code> element, then these values
+will override the corresponding attributes on the <code>svg</code> in the generated tree.</p>
+</blockquote>
+<p>This means that in the case of:</p>
+<pre><code class="language-xml">&lt;svg id=&quot;svg1&quot; width=&quot;80&quot; height=&quot;80&quot;&gt;
+    &lt;rect/&gt;
+&lt;/svg&gt;
+&lt;use xlink:href=&quot;#svg1&quot; width=&quot;100&quot; height=&quot;150&quot;/&gt;
+</code></pre>
+<p>The <code>width</code> and <code>height</code> properties on the <code>svg1</code> element must be ignored and replaced
+with the one provided by <code>use</code>.</p>
+<p>Weird, but not that strange for SVG. The next problem lies in the part not described in the spec.
+What if we have something like this:</p>
+<pre><code class="language-xml">&lt;svg id=&quot;svg1&quot; width=&quot;80&quot; height=&quot;80&quot;&gt;
+    &lt;rect/&gt;
+&lt;/svg&gt;
+&lt;use id=&quot;use1&quot; xlink:href=&quot;#svg1&quot; height=&quot;100&quot;/&gt;
+&lt;use id=&quot;use2&quot; xlink:href=&quot;#use1&quot; width=&quot;200&quot;/&gt;
+</code></pre>
+<p>Should we ignore the <code>width</code> from <code>use2</code>? Yes we do!<br>
+<code>width</code> and/or <code>height</code> only from the direct &quot;parent&quot; <code>use</code> element must be used.
+So our <code>svg1</code> would be 80x100 and not 200x100.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

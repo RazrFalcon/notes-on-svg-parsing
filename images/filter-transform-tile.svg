@@ -1,0 +1,10 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="198" height="198" fill="white" stroke="black"/>
+    <filter id="filter1">
+        <feFlood flood-color="seagreen" x="28" y="28" width="10" height="10"/>
+        <feOffset dx="5" dy="5"/>
+        <feTile/>
+    </filter>
+    <rect x="40" y="30" width="90" height="75"
+          filter="url(#filter1)" transform="skewX(30) rotate(30)"/>
+</svg>

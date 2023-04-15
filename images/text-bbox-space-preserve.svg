@@ -1,0 +1,10 @@
+<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+    <filter id="filter1" x="0" y="0" width="100%" height="100%" filterUnits="objectBoundingBox">
+        <feFlood flood-color="aquamarine"/>
+    </filter>
+    <rect x="1" y="1" width="198" height="78" fill="white" stroke="black"/>
+    <g font-family="Arial" font-size="48" text-anchor="middle">
+        <text x="100" y="60" filter="url(#filter1)" xml:space="preserve">  Text  </text>
+        <text x="100" y="60">Text</text>
+    </g>
+</svg>

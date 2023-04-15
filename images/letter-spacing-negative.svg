@@ -1,0 +1,7 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"
+     >
+    <rect x="1" y="1" width="198" height="198" fill="white" stroke="black"/>
+    <path d="M 20 100 L 180 100 M 100 20 L 100 180"
+          stroke="gray" stroke-width="0.5"/>
+    <text x="100" y="100" letter-spacing="-1000" text-anchor="middle" font-family="Noto Sans" font-size="72">Text</text>
+</svg>
