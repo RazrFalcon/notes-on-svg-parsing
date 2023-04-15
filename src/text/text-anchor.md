@@ -76,7 +76,7 @@ Somehow, even by removing a new line from the first text node we can change the 
 
 Notice that Safari no longer renders two words one the same line now.
 
-Whitespaces handling in SVG is its own circle of hell, which we discussed in
+Whitespaces handling in SVG is its own circle of hell, which we discuss in
 the [Whitespaces handling](./whitespaces.md) chapter. And it can affect even
 something seemingly unrelated like RTL text alignment.
 

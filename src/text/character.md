@@ -46,8 +46,7 @@ Ok, so an SVG character is a grapheme cluster. Needs some time to wrap your head
 and study modern typography, but looks simple enough. Wrong!
 
 First, SVG 1.1 doesn't actually define what a character is. Seriously.
-If you open [the spec](https://www.w3.org/TR/SVG11/text.html) there are no mentions of it.
-
+If you open [the spec](https://www.w3.org/TR/SVG11/text.html) there are no mentions of it.<br>
 Luckily, SVG 2 fixed this and provided us with a
 [definition](https://www.w3.org/TR/SVG2/text.html#Definitions)
 of... two kinds of characters?! What?!<br>

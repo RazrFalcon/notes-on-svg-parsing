@@ -1,0 +1,8 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <clipPath id="clipPath1">
+        <rect x="0" y="0" width="200" height="200" fill="black"/>
+    </clipPath>
+    <g clip-path="url(#clipPath1)" transform="translate(100 100)">
+        <circle cx="0" cy="0" r="80" fill="green"/>
+    </g>
+</svg>

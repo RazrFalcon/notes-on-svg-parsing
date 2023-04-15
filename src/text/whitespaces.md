@@ -1,13 +1,13 @@
 # Whitespaces handling
 
-Where do I even begin with this one... I think overall, I spent around a month
+Where do I even begin with this one... I think overall, I have spent around a month
 just to figure out how to properly extract text with whitespaces from an SVG.
 Not only the way SVG treats whitespaces is utterly unintuitive, but after you add `xml:space`
 to the mix, it becomes a truly horrifying thing.
 To this day, most SVG libraries do not handle `xml:space` properly.
 And to make things worse, SVG 2 added the `white-space` property, which is incompatible with `xml:space`.
 
-Note that while the root of the problem starts with XML, it's only partially responsible to this mess.
+Note that while the root of the problem starts with XML, it only partially responsible for this mess.
 
 Whitespaces handling is roughly split into two steps: XML side and SVG side.
 The only thing a proper XML library should do is to replace new lines with spaces.

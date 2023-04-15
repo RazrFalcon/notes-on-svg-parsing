@@ -3,7 +3,7 @@
 Most people are familiar with the concept of layers from image editing applications
 like Photoshop. Where each shape, image and text are represented as individual layers
 and each of those layers can be arbitrarily grouped.<br>
-It's a pretty simple idea. You essentially have a stack of images
+It's a pretty simple and intuitive idea. We essentially have a stack of images
 that are blended together to produce the final image.<br>
 And while SVG's XML structure may look like a tree of layers - it's not.
 
@@ -16,7 +16,7 @@ without creating individual images/layers. Except for _isolated groups_.
 What is an _isolated group_? This is a very good and a very complicated question.<br>
 And first we have to understand what is an SVG group.
 
-An SVG group, aka a `<g/>` element, is technically just a syntax sugar.
+An SVG group, aka the `<g/>` element, is technically just a syntax sugar.
 It allows us to visually group elements and/or propagate common properties.
 Meaning that:
 
@@ -38,7 +38,7 @@ And for our renderer such a group is [no-op](https://en.wikipedia.org/wiki/NOP_(
 We could skip it and simply render its children.
 
 On the other hand, clipping, masking, filters and opacity can be set only on groups.
-Yes, an ability to set the `opacity` attribute on other elements is just a syntax sugar as well.
+Yes, the ability to set the `opacity` attribute on other elements is just a syntax sugar.
 Meaning that:
 
 ```xml

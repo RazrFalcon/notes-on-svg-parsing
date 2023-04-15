@@ -67,5 +67,5 @@ In theory, each text chunk can be extracted into its own `text` element, while `
 
 Also, while it's not clear from the spec, each `textPath` defines a new chunk as well.
 
-An another interesting edge case is that there could be only one `writing-mode` per text element.
+Another interesting edge case is that there could be only one `writing-mode` per text element.
 An individual chunk or span cannot have their own writing modes.

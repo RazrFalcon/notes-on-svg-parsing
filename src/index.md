@@ -1,7 +1,7 @@
 # Intro
 
 After working on my SVG rendering library ([resvg](https://github.com/RazrFalcon/resvg))
-for the past 5 years, and working closely with SVG for the past 10, I've thought
+for the past 6 years, and working closely with SVG for the past 10, I've thought
 that this is enough time to have some interesting insight worth sharing.
 And there are definitely a lot to talk about.
 

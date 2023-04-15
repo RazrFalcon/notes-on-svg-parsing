@@ -46,7 +46,7 @@ M 10 20 H 10 20 30 V 40
 ## Implicit sequential MoveTo commands
 
 If we take the idea above and apply it to MoveTo (`M`) segments it _will not_ produce
-the output you expect.
+the output you would expect.
 
 In SVG, the following path will produce nothing since a single subpath must have
 at least two segments. And here we have two subpaths with a single segment.

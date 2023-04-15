@@ -27,4 +27,5 @@
   - [`text-anchor`](./text/text-anchor.md)
   - [`fill-rule`](./text/fill-rule.md)
 - [The `use` element](./use/index.md)
+  - [`use` to `symbol`](./use/use-to-symbol.md)
   - [`use` to `svg` size resolving](./use/use-to-svg-size-resolving.md)
